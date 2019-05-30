@@ -1,2 +1,0 @@
-/home/fshs/work/hirop/build/perception/filters/CMakeFiles/hirop_perception_ectomodule.dir
-/home/fshs/work/hirop/build/perception/CMakeFiles/sphinx-doc.dir
