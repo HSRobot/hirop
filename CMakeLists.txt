@@ -1,4 +1,5 @@
 cmake_minimum_required (VERSION 2.6)
 project (HiropFramework)
 
-add_subdirectory(perception)
+INCLUDE_DIRECTORIES(include)
+add_subdirectory(src)

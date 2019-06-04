@@ -16,14 +16,17 @@ if len(sys.argv) > 1:
 reader = ecto_pcl.PCDReader("Reader",
                             filename=pcdfile)
 
-tester = hirop_perception.RegionFilters("tester", maxZ=1)
+filters = hirop_perception.RegionFilters("tester", maxZ=1)
+
+fusion = hirop_perception.PclFusion()
 
 viewer = ecto_pcl.CloudViewer("viewer",
                               window_name="PCD Viewer")
 
 saver = ecto_pcl.PCDWriter("Saver")
 
-plasm.connect(reader[:] >> tester[:], tester[:] >> viewer[:], tester[:] >> saver[:])
+plasm.connect(reader["output"] >> fusion["input"], fusion["output"] >> viewer["input"])
+
 
 if __name__=="__main__":
     sched = ecto.Scheduler(plasm)
