@@ -1,5 +1,4 @@
 #include "pcl_fusion.h"
-#define DEBUG
 #include "utils/idebug.h"
 using namespace hirop_perception;
 
@@ -84,7 +83,6 @@ int PclFusion::process(const tendrils& inputs, const tendrils& outputs,
      * 如果当前已经融合了部分点云，则无需重新对_outPointCloud进行赋值
      */
     if(!haveCache){
-        _outPointCloud = ecto::pcl::PointCloud(tmp);
         haveCache = true;
     }else{
         /**
@@ -112,6 +110,7 @@ int PclFusion::process(const tendrils& inputs, const tendrils& outputs,
     }
 
     // 将点云发布出去
+    _outPointCloud = ecto::pcl::PointCloud(tmp);
     outputs.get<ecto::pcl::PointCloud>("output") = _outPointCloud;
     return ecto::OK;
 }

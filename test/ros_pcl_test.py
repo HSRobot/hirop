@@ -25,17 +25,16 @@ viewer = ecto_pcl.CloudViewer("viewer",
 
 saver = ecto_pcl.PCDWriter("Saver")
 
-source = hirop_perception.PointCloudRos('source1', topic_name="/camera/depth/points")
+source = hirop_perception.PointCloudRos('source1', topic_name="/camera/depth/points", world_frame='base_link')
 
-plasm.connect(source["output"] >> fusion["input"], fusion["output"] >> viewer["input"])
+plasm.connect(source["output"] >> fusion["input"], source["T"] >>fusion["T"], source["R"] >>fusion["R"], fusion["output"] >> viewer["input"])
 
 
 if __name__=="__main__":
     ecto_ros.init(sys.argv, "ros_test")
     sched = ecto.Scheduler(plasm)
     sched.execute(niter=1)
-    fusion.params.test=True
     #sleep 10 seconds and exit.
-    time.sleep(10)
+    time.sleep(20)
     sched.execute(niter=1)
-    time.sleep(10)
+    time.sleep(30)

@@ -3,7 +3,9 @@
 
 #include <ecto/ecto.hpp>
 #include <ecto_pcl/ecto_pcl.hpp>
+
 #include <ros/ros.h>
+#include <tf/transform_listener.h>
 #include <pcl_ros/point_cloud.h>
 
 using ecto::tendrils;
@@ -57,6 +59,15 @@ public:
 
 private:
     /**
+     * @brief   rosTf2Eigen 将ros的TF对象转换为Eigen对象
+     * @param[in] transform ROS的对象
+     * @param[out] t        得到的Eigen平移向量
+     * @param[out] r        得到的Eigen旋转矩阵
+     */
+    void rosTf2Eigen(const tf::StampedTransform& transform, Eigen::Vector3d& t, Eigen::Matrix3d &r);
+
+private:
+    /**
      * @brief mHandler  保存ROS节点句柄
      */
     ros::NodeHandle mHandler;
@@ -66,9 +77,25 @@ private:
      */
     pcl::PointCloud<pcl::PointXYZ>::Ptr _pointCloud;
 
+    /**
+     * @brief pointCloudSub 点云话题的监听者
+     */
     ros::Subscriber pointCloudSub;
 
+    /**
+     * @brief havePointCloud    是否已经接收到了点云
+     */
     bool havePointCloud;
+
+    /**
+     * @brief cameraFrame   保存上一次点云的相机坐标系名称
+     */
+    std::string cameraFrame;
+
+    /**
+     * @brief worldFrame    保存世界坐标系名称
+     */
+    std::string worldFrame;
 
 };
 
