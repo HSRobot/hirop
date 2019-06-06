@@ -70,7 +70,14 @@ private:
      */
     pcl::PointCloud<pcl::PointXYZRGB>::Ptr _pointCloud;
 
+    /**
+     * @brief _testFlag     测试标志位
+     */
     bool _testFlag;
+
+    bool haveCache;
+
+    ecto::pcl::PointCloud _outPointCloud;
 
 };
 }
