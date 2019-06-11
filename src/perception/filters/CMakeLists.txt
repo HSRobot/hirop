@@ -30,8 +30,6 @@ ectomodule(hirop_perception DESTINATION ${CMAKE_LIBRARY_OUTPUT_DIRECTORY} INSTAL
     ${SOURCES}
 )
 
-message("TF_LIBRARIES = " ${tf_LIBRARIES})
-
 link_ecto(hirop_perception
     ${roscpp_LIBRARIES}
     ${PCL_LIBRARIES}

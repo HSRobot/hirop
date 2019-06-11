@@ -1,0 +1,8 @@
+
+## 使用ORK的渲染工具
+FIND_PACKAGE(object_recognition_renderer REQUIRED)
+INCLUDE_DIRECTORIES(${object_recognition_renderer_INCLUDE_DIRS})
+ADD_LIBRARY(LinemodDetector linemod_detector.cpp)
+TARGET_LINK_LIBRARIES(LinemodDetector ${object_recognition_renderer_LIBRARIES})
+
+INSTALL(TARGETS LinemodDetector DESTINATION lib)
