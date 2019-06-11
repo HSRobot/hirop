@@ -13,7 +13,7 @@
 #include "object_recognition_renderer/renderer3d.h"
 #include <object_recognition_renderer/utils.h>
 
-#include "hpluginloader.h"
+#include "hplugin/hpluginloader.h"
 
 using namespace hirop_vision;
 
@@ -203,6 +203,7 @@ private:
     std::map <std::string, std::vector<float> > distances_;
 
     std::map <std::string, RendererIterator*> renderer_iterator_s;
+
 
     float icp_dist_min_;
     float px_match_min_;

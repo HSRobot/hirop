@@ -6,6 +6,9 @@ add_custom_target(headers SOURCES ${LibFiles})
 
 INCLUDE_DIRECTORIES(include)
 
+find_package(OpenCV REQUIRED)
+find_package(opencv_candidate REQUIRED)
+
 ## 声明当前处于Linux平台环境
 add_definitions(-D__LINUX__)
 
@@ -13,3 +16,5 @@ add_definitions(-D__LINUX__)
 set(CMAKE_INSTALL_PREFIX install)
 
 add_subdirectory(src)
+
+add_subdirectory(test)

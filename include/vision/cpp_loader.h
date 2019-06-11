@@ -4,7 +4,7 @@
 #include "itrainer.h"
 #include "idetector.h"
 
-#include "hpluginloader.h"
+#include "hplugin/hpluginloader.h"
 
 namespace hirop_vision{
 

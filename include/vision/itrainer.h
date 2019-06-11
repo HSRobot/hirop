@@ -23,7 +23,7 @@
 
 #include <iostream>
 #include "vision.h"
-#include "hplugin.h"
+#include "hplugin/hplugin.h"
 
 namespace hirop_vision{
 

@@ -17,6 +17,7 @@
 LinemodDetector::LinemodDetector():CBaseDetector("LinemodDetector", false){
     icp_dist_min_ = 0.06f;
     px_match_min_ = 0.25;
+    renderer_iterator_s = std::map <std::string, RendererIterator*>();
     initParam();
 }
 
@@ -191,10 +192,14 @@ int LinemodDetector::detection(){
     K_depth_.convertTo(K, CV_32F);
     cv::depthTo3d(depth, K, depth_real_ref_raw);
 
+
     /**
      * @brief BOOST_FOREACH 遍历刚刚使用linemod模板匹配到所有匹配对象
      */
     BOOST_FOREACH(const cv::linemod::Match & match, matches){
+
+        const std::vector<cv::linemod::Template>& templates =
+                detector_->getTemplates(match.class_id, match.template_id);
 
         /**
          * 填充位姿，训练过程中，一个物体代表一个claas_id，因此在识别过程中detctor_只能识别一个物体
@@ -214,7 +219,6 @@ int LinemodDetector::detection(){
         cv::Matx33d R_temp(R_match.inv());
         cv::Vec3d up(-R_temp(0,1), -R_temp(1,1), -R_temp(2,1));
         cv::Mat depth_ref_;
-
         renderer_iterator_s.at(match.class_id)->renderDepthOnly(depth_ref_, mask, rect, -T_match, up);
 
         /**
@@ -224,6 +228,7 @@ int LinemodDetector::detection(){
         cv::Mat renderK;
         K_match.convertTo(renderK, CV_32F);
         cv::depthTo3d(depth_ref_, renderK, depth_real_model_raw);
+
 
         /**
          * 生成点云和模型的包围矩形，<包围整个深度图>？
@@ -252,6 +257,7 @@ int LinemodDetector::detection(){
             rect_model.width = rect_ref.width;
         if (rect_model.height > rect_ref.height)
             rect_model.height = rect_ref.height;
+
 
         //  裁剪从传感器获得的深度转点云
         cv::Mat_<cv::Vec3f> depth_real_ref = depth_real_ref_raw(rect_ref);
@@ -287,6 +293,7 @@ int LinemodDetector::detection(){
                                           pts_real_ref_temp, pts_real_model_temp);
         if (px_ratio_missing > (1.0f-px_match_min_))
             continue;
+
 
         // 执行第一次近似ICP
         float px_ratio_match_inliers = 0.0f;
@@ -330,7 +337,7 @@ int LinemodDetector::detection(){
             float icp_dist = icpCloudToCloud(o_match->pts_ref, o_match->pts_model, o_match->r, o_match->t, icp_px_match, 0);
 
             if (verbose_)
-                std::cout << o_match->match_class <<  o_match->match_class << o_match->match_sim << " icp " << icp_dist << ", ";
+                std::cout << o_match->match_class <<  " " << o_match->match_sim << " icp " << icp_dist << ", ";
 
             //icp_dist in the same units as the sensor data
             //this distance is used to compute the ratio of inliers (points laying within this distance between the point clouds)

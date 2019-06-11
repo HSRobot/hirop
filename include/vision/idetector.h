@@ -24,7 +24,7 @@
 #include <iostream>
 #include <opencv2/imgproc/imgproc.hpp>
 
-#include "hplugin.h"
+#include "hplugin/hplugin.h"
 #include "vision.h"
 
 namespace hirop_vision{
