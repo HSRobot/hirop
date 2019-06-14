@@ -13,6 +13,7 @@ int Trainer::setTrainConfig(std::string fileName){
 
     std::string trainerName;
     std::string objectName;
+    YAML::Node trainPrivateParam;
 
     // 获取配置信息
     this->config = new Configure(fileName);
@@ -30,6 +31,12 @@ int Trainer::setTrainConfig(std::string fileName){
 
     if(this->trainer == NULL){
         std::cerr << "loading trainer: SimapleTrainer  error" << std::endl;
+    }
+
+    if(!config->getPrivateParams(trainPrivateParam)){
+        if(this->trainer->parseConfig(trainPrivateParam)){
+            return -1;
+        }
     }
 
     return 0;
@@ -101,16 +108,23 @@ int Trainer::__train(){
 int Trainer::__genPath(std::string &path){
 
     // 数据保存的前缀路径
-    std::string prefix = "/home/fshs/hirop_vision/data/";
+    std::string prefix = getObjectDataPath();
     std::string objectName;
     std::string trainerName;
 
     config->getObjectName(objectName);
     config->getTrainerName(trainerName);
 
-    // TODO: 检查路径是否存在，如果无则生成。检查路径是否有读写权限，如无则报错。
     path = prefix + trainerName + "/" + objectName + "/";
+
+    // 检查目录是否存在，不存在则创建
+    if( !boost::filesystem::exists(path))
+        boost::filesystem::create_directories(path);
 
     return 0;
 
+}
+
+void Trainer::getTrainerList(std::vector<std::string> &trainerList){
+    loader->getTrainerList(trainerList);
 }

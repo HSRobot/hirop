@@ -16,8 +16,9 @@
 #include <opencv2/highgui/highgui.hpp>
 #endif
 
+#include <utils/idebug.h>
 
-LinemodTrainer::LinemodTrainer():CBaseTrainer("LinemodTrainer"){
+LinemodTrainer::LinemodTrainer():CBaseTrainer("Linemod"){
     initParam();
 }
 
@@ -185,7 +186,13 @@ int LinemodTrainer::deleteData(){
     return 0;
 }
 
-int LinemodTrainer::parseConfig(){
+int LinemodTrainer::parseConfig(const YAML::Node &node){
+
+    if(!node["stlFile"]){
+        IErrorPrint("Dose not stlFile param");
+        return -1;
+    }
+    meshPath = node["stlFile"].as<std::string>();
     return 0;
 }
 

@@ -22,8 +22,11 @@
 #define __TRAINER_BASE_H__
 
 #include <iostream>
+#include <yaml-cpp/yaml.h>
+#include <hplugin/hplugin.h>
+
 #include "vision.h"
-#include "hplugin/hplugin.h"
+
 
 namespace hirop_vision{
 
@@ -45,7 +48,7 @@ public:
      * @brief   解析用户传递给训练器的配置，具体由具体的训练器进行实现
      * @return void
      */
-    virtual int parseConfig() = 0;
+    virtual int parseConfig(const YAML::Node &node) = 0;
 
     /**
      * @brief   保存训练器的结果，由具体的训练器进行实现

@@ -1,4 +1,5 @@
 #include "vision/c_base_trainer.h"
+#include <utils/idebug.h>
 
 using namespace hirop_vision;
 
@@ -14,4 +15,8 @@ int CBaseTrainer::getName(std::string &name){
 
 ENTITY_TYPE CBaseTrainer::getEntityType(){
     return this->entityType;
+}
+
+int CBaseTrainer::parseConfig(const YAML::Node &node){
+    IDebug("using defult setConfig function");
 }

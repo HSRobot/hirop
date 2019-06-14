@@ -23,6 +23,8 @@
 
 #include <iostream>
 
+#define OBJECT_DATA_PREFIX "hirop_vision/data"
+
 namespace hirop_vision {
 
 /**
@@ -59,6 +61,10 @@ typedef struct pose{
     struct position position;
 } pose;
 
+inline std::string getObjectDataPath(){
+    std::string homePath = getenv("HOME");
+    return  homePath + "/" +  OBJECT_DATA_PREFIX + "/";
 }
 
+}
 #endif

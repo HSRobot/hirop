@@ -9,6 +9,11 @@ Detector::Detector(){
     cppLoader = new CppLoader();
     pyLoader = PyLoader::getPyLoader();
     detectorPtr = NULL;
+
+    /**
+     *  获取物体训练数据的存放位置
+     */
+    objectDataPath = getObjectDataPath();
 }
 
 int Detector::detectionOnce(const cv::Mat &depthImg, const cv::Mat &colorImg){
@@ -83,13 +88,13 @@ int Detector::__detection(bool loop){
     ret = detectorPtr->detection();
     if(ret){
         std::cerr << "detection error" << std::endl;
-        return -1;
+        goto _detectionFaile;
     }
 
     ret = detectorPtr->getResult(results);
     if(ret){
         std::cerr << "get result error" << std::endl;
-        return -1;
+        goto _detectionFaile;
     }
 
     /**
@@ -101,6 +106,11 @@ int Detector::__detection(bool loop){
     delete detectionThr;
     detectionThr = NULL;
     return 0;
+
+_detectionFaile:
+    delete detectionThr;
+    detectionThr = NULL;
+    return -1;
 }
 
 
@@ -132,19 +142,19 @@ int Detector::setDetector(const std::string &name, const std::string &objectName
         this->detectorPtr = cppLoader->loadDetector(name);
 
     if(detectorPtr == NULL){
-        IErrorPrint("%s", "detectorPtr was NULL");
+        IErrorPrint("detectorPtr was NULL");
         return -1;
     }
 
     if(configFile.empty())
-        IDebug("%s", "setting detector config");
+        IDebug("setting detector config");
 
-    std::string prefix = "/home/fshs/hirop_vision/data/";
-    std::string detectorName = "LinemodTrainer";
+    std::string prefix = objectDataPath;
+    std::string detectorName = name;
 
     ret = detectorPtr->loadData(prefix + detectorName + "/" + objectName, objectName);
     if(ret){
-        IErrorPrint("%s", "detctorPtr loadData failed");
+        IErrorPrint("detctorPtr loadData failed");
         return -1;
     }
 
@@ -177,4 +187,23 @@ int Detector::setDetector(const std::string &name, const std::string &objectName
     return 0;
 }
 
+
+void Detector::getDetectorList(std::vector<std::string> &detectorList){
+    cppLoader->getDetectorList(detectorList);
+}
+
+int Detector::getObjectList(std::string detecorName, std::vector<std::string> &objectList){
+
+    boost::filesystem::path objectDataDir(objectDataPath + detecorName);
+    boost::filesystem::directory_iterator end;
+
+    for(boost::filesystem::directory_iterator pos(objectDataDir); pos != end; ++pos){
+        if(boost::filesystem::is_directory(*pos)){
+            objectList.push_back(pos->path().filename().string());
+        }
+    }
+
+    return objectList.size();
+
+}
 

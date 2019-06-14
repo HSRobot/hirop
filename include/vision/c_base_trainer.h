@@ -46,6 +46,13 @@ public:
      * @return      返回训练器的实现实体类别
      */
     ENTITY_TYPE getEntityType();
+
+    /**
+     * @brief setConfig 传递训练器的私有数据至训练器
+     * @param[in] node  私有参数
+     */
+    int parseConfig(const YAML::Node &node);
+
 };
 
 }

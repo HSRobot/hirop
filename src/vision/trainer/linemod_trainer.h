@@ -41,7 +41,7 @@ public:
      * @param
      * @return  0 成功 -1 失败
      */
-    int parseConfig();
+    int parseConfig(const YAML::Node &node);
 
     /**
      * @brief   获取训练进度

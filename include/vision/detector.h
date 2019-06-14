@@ -98,6 +98,19 @@ public:
      */
     int setOnStateChangeCallback(DetectStateListener *listener);
 
+    /**
+     * @brief       获取当前系统中可用的检测器列表
+     * @param[out]  detectorList 系统中可用的检测器列表
+     */
+    void getDetectorList(std::vector<std::string> &detectorList);
+
+    /**
+     * @brief getObjectList     获取当前识别器可识别的物体列表
+     * @param objectList        当前识别器可识别的物体列表
+     * @return      0 成功 -1 失败
+     */
+    int getObjectList(std::string detectorName, std::vector<std::string> &objectList);
+
 private:
 
     /**
@@ -119,6 +132,11 @@ private:
     // 识别的配置信息
     std::string objectName;
     std::string detectorName;
+
+    /**
+     * @brief objectDataPath    保存物体训练数据的根目录
+     */
+    std::string objectDataPath;
 
     CppLoader *cppLoader;
 

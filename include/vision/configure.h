@@ -24,7 +24,7 @@
 
 #include <iostream>
 #include <stdio.h>
-#include "yaml-cpp/yaml.h"
+#include <yaml-cpp/yaml.h>
 
 #ifdef DEBUG
 #define configDebug(format, ...)  printf("[debug ]: " #format "\n[detail]: File: %s, Line: %d, Function: %s \n",\
@@ -61,6 +61,14 @@ public:
      *          1 失败
      */
     int getTrainerName(std::string &trainerName);
+
+    /**
+     * @brief getPrivateConfig  获取训练器私有参数
+     * @return
+     *          0 成功
+     *          -1 无私有参数
+     */
+    int getPrivateParams(YAML::Node &privateParams);
 
 private:
     // 当前Configuere中的yaml配置文件实例

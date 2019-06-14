@@ -1,4 +1,5 @@
 #include "vision/configure.h"
+#include <utils/idebug.h>
 
 using namespace hirop_vision;
 
@@ -30,5 +31,15 @@ int Configure::getTrainerName(std::string &trainerName){
     trainerName = config["trainerName"].as<std::string>();
     configDebug("Get tarinerName: %s", trainerName.c_str());
 
+    return 0;
+}
+
+int Configure::getPrivateParams(YAML::Node &privateParams){
+    if(!config["parameters"]){
+        IDebug("no private parameters");
+        return -1;
+    }
+
+    privateParams = config["parameters"];
     return 0;
 }

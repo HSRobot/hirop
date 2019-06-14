@@ -18,7 +18,7 @@ add_library(hirop_vision ${FRAMEWORK_SRCS} utils/py_lock_helper.cpp)
 TARGET_LINK_LIBRARIES(hirop_vision python3.5m ${YAMLCPP6_LIBS}
     ${HPLUGIN_LIBS}
     ${OpenCV_LIBRARIES}
-    boost_thread boost_system)
+    boost_thread boost_system boost_filesystem)
 
 ## 安装目标文件
 install(TARGETS hirop_vision DESTINATION lib)

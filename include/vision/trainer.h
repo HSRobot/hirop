@@ -93,6 +93,12 @@ public:
      */
     int setOnStateChangeListener(TrainStateListener *listener);
 
+    /**
+     * @brief getTrainerList    获取系统中可用的训练器列表
+     * @param[out] trainerList  返回系统中可用的训练器列表
+     */
+    void getTrainerList(std::vector<std::string> &trainerList);
+
 private:
 
     /**
