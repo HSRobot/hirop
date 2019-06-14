@@ -38,11 +38,15 @@ int Detector::detectionOnce(const cv::Mat &depthImg, const cv::Mat &colorImg){
     detectorPtr->setColorImg(colorImg);
     detectorPtr->setDepthImg(depthImg);
 
-    boost::function0<int> f =  boost::bind(&Detector::__detection,this, false);
-    detectionThr = new boost::thread(f);
+    /**
+     * 暂时将线程功能关闭，因为当前Linemod识别器在线程下运行时有BUG
+     */
+    __detection(false);
+//    boost::function0<int> f =  boost::bind(&Detector::__detection,this, false);
+//    detectionThr = new boost::thread(f);
 
-    // 启动线程
-    detectionThr->timed_join(boost::posix_time::microseconds(1));
+//    // 启动线程
+//    detectionThr->timed_join(boost::posix_time::microseconds(1));
 
     return 0;
 
