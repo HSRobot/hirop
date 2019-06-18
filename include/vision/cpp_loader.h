@@ -25,7 +25,7 @@
  */
 #define TRAINER_REGEX "(?<=lib)\\w+Trainer"
 
-#define LIB_SERACH_PATH "./"
+#define LIB_SERACH_PATH ""
 
 namespace hirop_vision{
 

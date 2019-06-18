@@ -81,17 +81,20 @@ int PointCloudRos::process(const tendrils& in, const tendrils& out){
 
 void PointCloudRos::pointCloudCallBack(const sensor_msgs::PointCloud2::ConstPtr & msg){
 
-    pcl::PointCloud<pcl::PointXYZ>::Ptr cloud (new pcl::PointCloud<pcl::PointXYZ>);
-    const sensor_msgs::PointCloud2 tmp = *msg;
+    pcl::PCLPointCloud2* cloud = new pcl::PCLPointCloud2;
+    pcl_conversions::toPCL(*msg, *cloud);
 
     cameraFrame = msg->header.frame_id;
 
     /**
-     * 此处会进行深度拷贝
+     * @brief pcl::fromPCLPointCloud2   将PointCloud2 转换为 PointCloud
      */
-    pcl::fromROSMsg(tmp, *cloud);
+    pcl::PointCloud<pcl::PointXYZRGB>::Ptr pcl_cloud (new pcl::PointCloud<pcl::PointXYZRGB>);
+    pcl::fromPCLPointCloud2(*cloud, *pcl_cloud);
 
-    _pointCloud = cloud;
+    _pointCloud = pcl_cloud;
+
+    delete cloud;
 
     havePointCloud = true;
 }

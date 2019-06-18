@@ -6,7 +6,6 @@ PclFusion::PclFusion(){
     _pointCloud = pcl::PointCloud<pcl::PointXYZRGB>::Ptr(new pcl::PointCloud<pcl::PointXYZRGB>);
     _testFlag = false;
     haveCache = false;
-
     IDebug("PCL Funsion create");
 }
 
@@ -16,7 +15,8 @@ PclFusion::~PclFusion(){
 }
 
 void PclFusion::declare_params(tendrils& params){
-    params.declare<bool>("clean","clean the cache point cloud");
+    params.declare<bool>("clean", "clean the cache point cloud");
+    params.declare<bool>("save", "saving the pcl file", false);
 #ifdef DEBUG
     params.declare<bool>("test", "the debug flag");
 #endif
@@ -45,6 +45,8 @@ void PclFusion::configure(const tendrils &params, const tendrils &inputs, const 
 #ifdef DEBUG
     params["test"]->set_callback<bool>(boost::bind(&PclFusion::testFlagChange, this, _1));
 #endif
+    isSaving = params["save"];
+    isCleaning = params["clean"];
 }
 
 template <typename Point>
@@ -73,6 +75,7 @@ int PclFusion::process(const tendrils& inputs, const tendrils& outputs,
     Eigen::Vector3d tmpPos;
     Eigen::Vector3d tmpValue;
     Point tmpPoint;
+    int size = input->points.size();
 
     /**
      * @brief tmp   该变量的主要目的是作为载体，使得可以修改const变量
@@ -92,8 +95,28 @@ int PclFusion::process(const tendrils& inputs, const tendrils& outputs,
         *tmp =  *(boost::get<typename pcl::PointCloud<Point>::ConstPtr>(_outPointCloud.make_variant()));
     }
 
-    int size = input->points.size();
+    /**
+     * 如果准备将点云进行保存了，那么此时就不能将新获取到的点云融合进来，直接返回之前的点云即可。
+     */
+    if( (*isSaving)  == true ){
+        IDebug("saving point cloud");
+        goto _processOut;
+    }
+
+    /**
+     *  如果准备清空当前系统的点云，那么此时也不能将新获取到的点云融合进来
+     *  当前的清空方式只是将点云对象中的Vector进行clear操作
+     */
+    if(*isCleaning){
+        IDebug("cleaning point cloud");
+        tmp->points.clear();
+        goto _processOut;
+    }
+
     for(int i = 0; i < size; i++){
+
+        tmpPoint = Point(input->points[i]);
+
         /**
          *      先计算旋转 [x,y,z] * R
          */
@@ -109,9 +132,29 @@ int PclFusion::process(const tendrils& inputs, const tendrils& outputs,
         tmp->points.push_back(tmpPoint);
     }
 
+_processOut:
+
+    /**
+     *  重新计算点云的宽和高
+     */
+    tmp->width = 1;
+    tmp->height = tmp->points.size();
+
     // 将点云发布出去
     _outPointCloud = ecto::pcl::PointCloud(tmp);
     outputs.get<ecto::pcl::PointCloud>("output") = _outPointCloud;
+
+    /**
+     *  由于ecto框架中，如果模块的输入上一次和其他模块的输出连接过，那么就算该次输入未被连接，相关的输入也保持着之前的数值
+     *  而该模块在无输入连接时需要使用默认值，所以每次process后都对R和T的值进行默认化
+     */
+    Eigen::Matrix3d defaultR;
+    defaultR << 1, 0, 0,
+            0, 1, 0,
+            0, 0, 1;
+    Eigen::Vector3d defaultT(0, 0, 0);
+    inputs.get<Eigen::Matrix3d>("R") = defaultR;
+    inputs.get<Eigen::Vector3d>("T") = defaultT;
     return ecto::OK;
 }
 

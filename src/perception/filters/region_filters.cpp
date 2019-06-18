@@ -41,6 +41,9 @@ void RegionFilters::configure(const ecto::tendrils &params, const ecto::tendrils
 }
 
 int RegionFilters::process(const ecto::tendrils &in, const ecto::tendrils &out){
+
+    std::cout << "in process" << std::endl;
+
     _pointCloud = in.get<ecto::pcl::PointCloud>("input");
     ecto::pcl::xyz_cloud_variant_t variant = _pointCloud.make_variant();
 

@@ -47,7 +47,7 @@ public:
     int process(const tendrils& in, const tendrils& out);
 
     /**
-     * @brief   过滤器的配置
+     * @brief   过滤Fusion point cloud by R&T器的配置
      */
     void configure(const tendrils& params, const tendrils& inputs, const tendrils& outputs);
 
@@ -75,7 +75,7 @@ private:
     /**
      * @brief _pointCloud   保存上一次接收到的点云
      */
-    pcl::PointCloud<pcl::PointXYZ>::Ptr _pointCloud;
+    pcl::PointCloud<pcl::PointXYZRGB>::Ptr _pointCloud;
 
     /**
      * @brief pointCloudSub 点云话题的监听者

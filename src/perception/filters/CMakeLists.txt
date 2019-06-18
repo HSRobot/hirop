@@ -26,6 +26,11 @@ IF(WITH_REGION)
 ENDIF(WITH_REGION)
 
 
+SET(SOURCES
+        ${SOURCES}
+        pointcloud_publish.cpp
+)
+
 ectomodule(hirop_perception DESTINATION ${CMAKE_LIBRARY_OUTPUT_DIRECTORY} INSTALL
     ${SOURCES}
 )

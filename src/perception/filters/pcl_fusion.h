@@ -75,10 +75,25 @@ private:
      */
     bool _testFlag;
 
+    /**
+     * @brief haveCache     当前是否已经融合过点云的标志位
+     */
     bool haveCache;
 
-    ecto::pcl::PointCloud _outPointCloud;
+    /**
+     * @brief isSaving      当前循环处于保存文件的状态
+     */
+    ecto::spore<bool> isSaving;
 
+    /**
+     * @brief isCleaning    当前循环清空已缓存的点云
+     */
+    ecto::spore<bool> isCleaning;
+
+    /**
+     * @brief _outPointCloud    保存已融合的点云
+     */
+    ecto::pcl::PointCloud _outPointCloud;
 };
 }
 
