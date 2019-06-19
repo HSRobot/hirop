@@ -14,6 +14,9 @@
 #define DEBUG
 #include <utils/idebug.h>
 
+
+
+
 LinemodDetector::LinemodDetector():CBaseDetector("LinemodDetector", false){
     icp_dist_min_ = 0.06f;
     px_match_min_ = 0.25;
@@ -190,7 +193,11 @@ int LinemodDetector::detection(){
     tmpMat_ << 527.6911 , 0, 478.74231, 0, 528.01282, 266.14407, 0, 0, 1;
     K_depth_ = tmpMat_;
     K_depth_.convertTo(K, CV_32F);
+#if CV_MAJOR_VERSION == 3
+    cv::rgbd::depthTo3d(depth, K, depth_real_ref_raw);
+#else
     cv::depthTo3d(depth, K, depth_real_ref_raw);
+#endif
 
 
     /**
@@ -227,8 +234,11 @@ int LinemodDetector::detection(){
         cv::Mat_<cv::Vec3f> depth_real_model_raw;
         cv::Mat renderK;
         K_match.convertTo(renderK, CV_32F);
+#if CV_MAJOR_VERSION == 3
+        cv::rgbd::depthTo3d(depth_ref_, renderK, depth_real_model_raw);
+#else
         cv::depthTo3d(depth_ref_, renderK, depth_real_model_raw);
-
+#endif
 
         /**
          * 生成点云和模型的包围矩形，<包围整个深度图>？
