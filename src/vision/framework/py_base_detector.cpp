@@ -206,3 +206,7 @@ int PyBaseDetector::isMultiDetector(){
 
     return 0;
 }
+
+int PyBaseDetector::parseConfig(const YAML::Node &node){
+    return 0;
+}

@@ -24,8 +24,11 @@
 #include <iostream>
 #include <opencv2/imgproc/imgproc.hpp>
 
+#include <yaml-cpp/yaml.h>
+
 #include "hplugin/hplugin.h"
 #include "vision.h"
+
 
 namespace hirop_vision{
 
@@ -43,11 +46,11 @@ public:
      */
     virtual int detection() = 0;
 
-    //    /**
-    //     * @brief   解析识别器私有训练器配置，具体由相关识别器实现
-    //     * @return void
-    //     */
-    //    virtual int parseConfig() = 0;
+    /**
+     * @brief   解析识别器私有训练器配置，具体由相关识别器实现
+     * @return void
+     */
+    virtual int parseConfig(const YAML::Node &node) = 0;
 
     /**
      * @brief   加载相关识别器识别时需要的数据

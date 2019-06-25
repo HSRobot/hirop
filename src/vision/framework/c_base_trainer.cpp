@@ -19,4 +19,5 @@ ENTITY_TYPE CBaseTrainer::getEntityType(){
 
 int CBaseTrainer::parseConfig(const YAML::Node &node){
     IDebug("using defult setConfig function");
+    return 0;
 }

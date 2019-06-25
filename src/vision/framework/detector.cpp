@@ -1,6 +1,8 @@
 #include "vision/detector.h"
 #include "utils/idebug.h"
 
+#include <vision/configure.h>
+
 using namespace hirop_vision;
 
 Detector::Detector(){
@@ -150,8 +152,16 @@ int Detector::setDetector(const std::string &name, const std::string &objectName
         return -1;
     }
 
-    if(configFile.empty())
+    if( !configFile.empty()){
         IDebug("setting detector config");
+        YAML::Node privateParam;
+        Configure *config = new Configure(configFile);
+        if(!config->getPrivateParams(privateParam)){
+            if(this->detectorPtr->parseConfig(privateParam)){
+                return -1;
+            }
+        }
+    }
 
     std::string prefix = objectDataPath;
     std::string detectorName = name;

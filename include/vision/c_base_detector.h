@@ -20,6 +20,8 @@ public:
 
     int isMultiDetector();
 
+    int parseConfig(const YAML::Node &node);
+
 private:
 };
 

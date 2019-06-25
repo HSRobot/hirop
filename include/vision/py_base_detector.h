@@ -29,6 +29,12 @@ public:
     ~PyBaseDetector();
 
     /**
+     * @brief   解析识别器私有训练器配置，具体由相关识别器实现
+     * @return void
+     */
+    int parseConfig(const YAML::Node &node);
+
+    /**
      * @brief   调用该函数后，检测器便开始进行物体检测
      * @return  0 检测成功 -1 检测失败
      */

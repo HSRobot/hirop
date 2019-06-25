@@ -28,3 +28,7 @@ void CBaseDetector::setDepthImg(const cv::Mat &inputImg){
 int CBaseDetector::isMultiDetector(){
     return _isMultiDetector;
 }
+
+int CBaseDetector::parseConfig(const YAML::Node &node){
+    return 0;
+}
