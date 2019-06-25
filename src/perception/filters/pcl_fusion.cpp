@@ -87,6 +87,14 @@ int PclFusion::process(const tendrils& inputs, const tendrils& outputs,
      */
     if(!haveCache){
         haveCache = true;
+        /**
+         * 这是一段很神奇的代码。必须要将tmp的一部分属性赋值成input的属性（具体是啥属性，我也不知道，那就全部赋值得了）。
+         * 不然处理过后的点云就会不显示颜色（颜色属性是有的），那就只能这样咯。牺牲一下性能。在下面的赋值会进行深度拷贝。
+         * 所以要对点云进行Clear，毕竟不能直接拿输入的点云作为输出。
+         * 要是有人找到是啥问题，麻烦告诉我一下。特别好奇 -.- 2019/06/25
+         */
+        *tmp = *input;
+        tmp->points.clear();
     }else{
         /**
          * 将const变量通过该方式传递给非const变量
