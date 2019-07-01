@@ -1,0 +1,26 @@
+regionFilter:
+	enable: true
+	configFile: 
+
+rosSource:
+	enable: true
+	configFile: 
+
+pclFunsion:
+	enable: true
+
+pclViewer:
+	enable: true
+	configFile: 
+
+saver:
+	enable: true
+	configFile: 
+
+loader:
+	enable: true
+	configFile: 
+
+publisher:
+	enable: true
+	configFile: 

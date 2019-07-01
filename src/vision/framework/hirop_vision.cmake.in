@@ -1,0 +1,12 @@
+FIND_LIBRARY(hirop_vision_LIBRARY hirop_vision
+    PATHS @CMAKE_INSTALL_PREFIX@/lib
+    NO_DEFAULT_PATH
+)
+SET(hirop_vision_LIBRARIES ${hirop_vision_LIBRARY})
+
+FIND_PATH(hirop_vision_INCLUDE_DIR vision/vision.h
+    PATHS @CMAKE_INSTALL_PREFIX@/include
+    NO_DEFAULT_PATH
+)
+
+SET(hirop_vision_INCLUDE_DIRS ${hirop_vision_INCLUDE_DIR})

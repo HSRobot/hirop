@@ -1,4 +1,6 @@
-INCLUDE_DIRECTORIES(/usr/include/python3.5)
+
+## 使用PYthon3版本
+FIND_PACKAGE(Python 3 REQUIRED COMPONENTS Development)
 
 ## 使用ORK的渲染工具
 FIND_PACKAGE(object_recognition_renderer REQUIRED)
@@ -10,6 +12,7 @@ FIND_PACKAGE(yaml-cpp REQUIRED)
 
 INCLUDE_DIRECTORIES(${OpenCV_INCLUDE_DIRS})
 INCLUDE_DIRECTORIES(${object_recognition_renderer_INCLUDE_DIRS})
+INCLUDE_DIRECTORIES(${Python_INCLUDE_DIRS})
 
 ## 支持C++11 因为Yaml-cpp使用了c++11
 add_definitions(-std=c++11)

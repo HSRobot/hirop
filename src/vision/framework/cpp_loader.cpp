@@ -21,6 +21,11 @@ CppLoader::CppLoader(){
         libSerachPaths.push_back(path + "/");
     }
 
+    /**
+     * @brief 支持从当前路径加载插件
+     */
+    libSerachPaths.push_back("./");
+
 }
 
 ITrainer *CppLoader::loadTrainer(std::string trainerName){
