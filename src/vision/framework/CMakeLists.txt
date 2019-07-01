@@ -17,3 +17,6 @@ TARGET_LINK_LIBRARIES(hirop_vision python3.5m
 
 ## 安装目标文件
 install(TARGETS hirop_vision DESTINATION lib)
+
+## 安装头文件
+install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/ DESTINATION include)

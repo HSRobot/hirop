@@ -27,6 +27,12 @@
 
 #define LIB_SERACH_PATH ""
 
+/**
+ * @brief   LIB_SERACH_PATH_ENV
+ *          获取插件搜索路径的环境变量名称
+ */
+#define LIB_SERACH_PATH_ENV "VISION_PLUGIN_PATH"
+
 namespace hirop_vision{
 
 class CppLoader{
@@ -67,6 +73,8 @@ private:
      * @brief libSerachPath 库的搜索路径
      */
     std::string libSerachPath;
+
+    std::vector<std::string> libSerachPaths;
 };
 
 }
