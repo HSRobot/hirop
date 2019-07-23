@@ -23,7 +23,7 @@
 
 #include <iostream>
 #include <yaml-cpp/yaml.h>
-#include <hplugin/hplugin.h>
+#include <hplugin.h>
 
 #include "vision.h"
 

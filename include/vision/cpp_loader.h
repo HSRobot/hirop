@@ -6,7 +6,7 @@
 #include "itrainer.h"
 #include "idetector.h"
 
-#include "hplugin/hpluginloader.h"
+#include <hpluginloader.h>
 
 
 /**

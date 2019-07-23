@@ -4,27 +4,40 @@
 
 #include "vision/cpp_loader.h"
 
-
 using namespace hirop_vision;
 
 CppLoader::CppLoader(){
+
+    const char *env;
+
     this->loader = HPluginLoader::getLoader();
 
-    libSerachPath = getenv(LIB_SERACH_PATH_ENV);
-    std::vector<std::string> paths;
-    boost::split(paths, libSerachPath, boost::is_any_of(":"));
+    env = getenv(LIB_SERACH_PATH_ENV);
 
-    /**
-     * @brief 从环境变量中获取库的搜索路径，支持多路径
-     */
-    BOOST_FOREACH(std::string path, paths){
-        libSerachPaths.push_back(path + "/");
+    if(env != NULL){
+
+        libSerachPath = env;
+
+        std::vector<std::string> paths;
+        boost::split(paths, libSerachPath, boost::is_any_of(":"));
+
+        /**
+         * @brief 从环境变量中获取库的搜索路径，支持多路径
+         */
+        BOOST_FOREACH(std::string path, paths){
+            libSerachPaths.push_back(path + "/");
+        }
+
     }
-
     /**
      * @brief 支持从当前路径加载插件
      */
     libSerachPaths.push_back("./");
+
+    /**
+     * 支持从LD_LIBRARY_PATH环境变量路径加载插件
+     */
+    libSerachPaths.push_back("");
 
 }
 
@@ -32,15 +45,8 @@ ITrainer *CppLoader::loadTrainer(std::string trainerName){
 
     HPlugin *plugin;
 
-    /**
-     * @brief 尝试在所有路径中寻找相关的库
-     */
-    BOOST_FOREACH(std::string path, libSerachPaths){
-        loader->setPath(path);
-        plugin = loader->load(trainerName + "Trainer");
-        if(plugin != NULL)
-            break;
-    }
+    loader->setPaths(libSerachPaths);
+    plugin = loader->load(trainerName + "Trainer");
 
     if(plugin == NULL)
         return NULL;
@@ -51,15 +57,8 @@ ITrainer *CppLoader::loadTrainer(std::string trainerName){
 IDetector *CppLoader::loadDetector(std::string detectorName){
     HPlugin *plugin;
 
-    /**
-     * @brief 尝试在所有路径中寻找相关的库
-     */
-    BOOST_FOREACH(std::string path, libSerachPaths){
-        loader->setPath(path);
-        plugin = loader->load(detectorName + "Detector");
-        if(plugin != NULL)
-            break;
-    }
+    loader->setPaths(libSerachPaths);
+    plugin = loader->load(detectorName + "Detector");
 
     if(plugin == NULL)
         return NULL;
@@ -96,7 +95,14 @@ void CppLoader::getDetectorList(std::vector<std::string> &detectorList){
             /**
          * 通过正则表达式 获取文件名中的检测器名称
          */
-            if(boost::xpressive::regex_search(pos->path().filename().string().c_str(), what, reg)){
+            std::string tmp(pos->path().filename().string());
+
+            /**
+             *  如果直接使用pos->path().filename().string().c_str()作为第一参数的话，那么是可悲的。
+             *  因为还有调用regex_search这个函数的时候，这个c_str所指向的char *里的数据就已经没了。
+             *  因为c_str返回的数据是由string维护的
+             */
+            if(boost::xpressive::regex_search(tmp.c_str(), what, reg)){
                 /**
              * 这里我们假定匹配到的第一个字符串就是识别器的名称
              */
@@ -130,10 +136,12 @@ void CppLoader::getTrainerList(std::vector<std::string> &trainerList){
          */
             boost::xpressive::cmatch what;
 
+            std::string tmp(pos->path().filename().string());
+
             /**
          * 通过正则表达式 获取文件名中的检测器名称
          */
-            if(boost::xpressive::regex_search(pos->path().filename().string().c_str(), what, reg)){
+            if(boost::xpressive::regex_search(tmp.c_str(), what, reg)){
                 /**
              * 这里我们假定匹配到的第一个字符串就是识别器的名称
              */

@@ -13,7 +13,7 @@
 #include "object_recognition_renderer/renderer3d.h"
 #include <object_recognition_renderer/utils.h>
 
-#include "hplugin/hpluginloader.h"
+#include <hpluginloader.h>
 
 using namespace hirop_vision;
 
