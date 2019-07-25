@@ -128,7 +128,7 @@ void LinemodDetector::loadVectorMat(std::string &fileName, std::vector<cv::Mat> 
 
     while(std::getline(in, tmpLine, '|')){
         // 删除所有换行
-        tmpLine = boost::algorithm::erase_all_copy(tmpLine, "\n ");
+        tmpLine = boost::algorithm::erase_all_copy(tmpLine, "\n");
         tmpLine.erase(0, 1);
 
         boost::split(rss, tmpLine, boost::is_any_of(" "));

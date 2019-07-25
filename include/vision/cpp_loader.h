@@ -15,7 +15,7 @@
  * \\w+     表示有1个或1个以上的字符串
  * Trainer  表示识别器名称最后必须由Trainer组成
  */
-#define DETECTOR_REGEX "(?<=lib)\\w+Detector"
+#define DETECTOR_REGEX "(?<=lib)\\w+(?<=Detector)"
 
 /**
  * @brief   DETECTOR_REGEX   通过文件名获取训练器名称的正则表达式
@@ -23,7 +23,7 @@
  * \\w+     表示有1个或1个以上的字符串
  * Trainer  表示训练器名称最后必须由Trainer组成
  */
-#define TRAINER_REGEX "(?<=lib)\\w+Trainer"
+#define TRAINER_REGEX "(?<=lib)\\w+(?<=Trainer)"
 
 #define LIB_SERACH_PATH ""
 

@@ -37,7 +37,7 @@ CppLoader::CppLoader(){
     /**
      * 支持从LD_LIBRARY_PATH环境变量路径加载插件
      */
-    libSerachPaths.push_back("");
+    //libSerachPaths.push_back("");
 
 }
 
