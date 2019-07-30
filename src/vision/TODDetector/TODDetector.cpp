@@ -12,7 +12,9 @@ string toString(T& t){
 TODDetector::TODDetector():CBaseDetector("TODDetector", false){
     TCCVSION = new TensorflowCCVisoin();
     LineDeTool = new LinemodDetector();
-    LineDeTool->loadData("/home/fshs/hirop_vision/data/TOD/milk_step10","milk","ply");
+    index = 0;
+
+
     initParam();
 }
 
@@ -24,9 +26,9 @@ TODDetector::~TODDetector()
 
 int TODDetector::loadData(const std::string path, const std::string objectName){
 //    TCCVSION->LoadModel(path);
-//    cout <<"path： " << path<< endl;
-//    cout <<"objectName：" <<objectName<<endl;
-//LineDeTool->loadData(path , objectName);
+    cout <<"path： " << path<< endl;
+    cout <<"objectName：" <<objectName<<endl;
+//LineDeTool->loadDatfaster_rcnn_inception_resnet_v2_atrous_coco-15000-20190726a(path , objectName);
     return 0;
 }
 void TODDetector::setColorImg(const cv::Mat &inputImg){
@@ -50,6 +52,15 @@ void TODDetector::setColorImg(const cv::Mat &inputImg){
 void TODDetector::setDepthImg(const cv::Mat &inputImg){
     cout<< "setDepthImg "<< inputImg.depth()<<endl;
     DepthImg = inputImg;
+    for( int i = 0; i < DepthImg.rows; i++){
+        for( int j = 0; j < DepthImg.cols; j++){
+            short val = DepthImg.at<ushort>(i,j);
+            if( val > 1000){
+                DepthImg.at<ushort>(i,j) = 0;
+            }
+        }
+    }
+
     DepthShow = DepthImg.clone();
 }
 
@@ -71,6 +82,15 @@ int TODDetector::getResult(std::vector<pose> &poses){
     }else{
         // detection ok
         poses = outposedd;
+        for(int i =0; i < poses.size() ;i++){
+            std::cout << " out: "<< poses[i].position.x<<" "  \
+                        << poses[i].position.y<<" "  \
+                        << poses[i].position.z<<" "  \
+                        << poses[i].quaternion.x<<" "  \
+                        <<poses[i].quaternion.y<<"  " \
+                        <<poses[i].quaternion.z<<"  " \
+                        <<poses[i].quaternion.w <<std::endl;
+        }
     }
 
 
@@ -99,7 +119,10 @@ int TODDetector::initParam(){
     if( TCCVSION != nullptr)
         TCCVSION->init(ColorWidth, ColorHeight);
 
+
+    LineDeTool->loadData("/home/fshs/hirop_vision/data/TOD/milk12","milk","ply");
     TCCVSION->LoadModel("/home/fshs/KongWork/pb/frozen_inference_graph-20190713-2.pb");
+//    TCCVSION->LoadModel("/home/fshs/KongWork/pb/faster_rcnn_inception_resnet_v2_atrous_coco-15000-20190726.pb");
     name = "TODDetection";
     outPose = vector<float>(6);
     return 0;
@@ -126,11 +149,6 @@ int TODDetector::detection(){
     outPose.clear();
 
 
-//    resize(ColorImg, ColorImg, Size(960,540));
-//    cvtColor(ColorImg,ColorImg ,COLOR_RGB2BGR);
-//    imwrite("/home/fshs/KongWork/hirop/build/depthTest.jpg", DepthImg);
-//    imwrite("/home/fshs/KongWork/hirop/build/ColorImg.png", ColorImg);
-
     IDebug("%s, %d, %d", "ColorImg size ", ColorImg.cols, ColorImg.rows);
     int rtn = TCCVSION->detection(ColorImg, outPose);
     outposedd.clear();
@@ -150,7 +168,7 @@ int TODDetector::detection(){
     Point p11(x1,y1), p12(x2, y2), p21, p22;
     ScalarPoint(p11,p12, p21, p22);
     depthRect = Rect(p21,p22);
-    Rect rRoi = Rect(depthRect.x, depthRect.y, depthRect.width*1.2 ,depthRect.height);
+    Rect rRoi = Rect(depthRect.x-5, depthRect.y, depthRect.width*1.3 ,depthRect.height);
     depthRect = rRoi;
 
     cv::Mat ColorTemp = ColorShow(depthRect);
@@ -170,7 +188,7 @@ int TODDetector::detection(){
     imwrite("/home/fshs/KongWork/data-test/other/ColorTemp" +toString(index)+ ".jpg", ColorTemp);
     imwrite("/home/fshs/KongWork/data-test/other/DepthZero" +toString(index)+ ".png", DepthZero);
     imwrite("/home/fshs/KongWork/data-test/JPEGImages/ColorZero" +toString(index)+ ".png", ColorZero);
-//    cv::Mat RoiDepth = DepthImg(depthRect);
+
     //linemod 的三维图像识别
      LineDeTool->setColorImg(ColorZero);
      LineDeTool->setDepthImg(DepthZero);
