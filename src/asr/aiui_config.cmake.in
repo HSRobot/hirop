@@ -1,0 +1,10 @@
+#pragma once
+/**
+ * 请不要编辑该文件，该文件由CMAKE自动生成
+ */
+#define AIUI_APPID "@AIUI_APPID@"
+#define AIUI_CONFIG_PATH "@AIUI_CONFIG_PATH@"
+#define AIUI_DIR "@AIUI_CONFIG_PATH@/AIUI/"
+#define AIUI_LOG "@AIUI_CONFIG_PATH@/AIUI/log"
+#define AIUI_CONFIG_FILE "@AIUI_CONFIG_PATH@//AIUI/cfg/aiui.cfg"
+

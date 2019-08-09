@@ -20,3 +20,14 @@ target_link_libraries(nav_test
     hirop_nav)
 
 install(TARGETS nav_test DESTINATION bin)
+
+set(AIUI_PATH "/home/fshs/work/Linux_awaken_exp/")
+
+INCLUDE_DIRECTORIES(${AIUI_PATH}/include)
+
+add_executable(asr_test asr_test.cpp)
+
+target_link_libraries(asr_test
+    hirop_asr)
+
+install(TARGETS asr_test DESTINATION bin)
