@@ -12,8 +12,6 @@ add_definitions(-D_GLIBCXX_USE_CXX11_ABI=0)
 ## 指定自定义AIUI的路径
 set(AIUI_PATH "/home/fshs/work/Linux_awaken_exp/")
 
-set(AIUI_LIBS_PATH "${AIUI_PATH}/libs/x64/")
-
 ## 指定自定义AIUI的APPID
 set(AIUI_APPID "5a950e5a")
 
@@ -27,13 +25,13 @@ configure_file (
 )
 
 ## 导入AIUI相关的头文件路径
-INCLUDE_DIRECTORIES("${AIUI_PATH}include")
+INCLUDE_DIRECTORIES("${PORJECT_SOURCE_DIR}/include")
 
 # 使得工程可以找到通过cmake生成的头文件 aiui_config.h
 INCLUDE_DIRECTORIES(${PROJECT_BINARY_DIR})
 
 # 寻找AIUI的库
-FIND_LIBRARY(AIUI_LIBS aiui ${AIUI_LIBS_PATH})
+FIND_LIBRARY(AIUI_LIBS aiui "${PORJECT_SOURCE_DIR}/3rds/libs")
 
 if(${AIUI_LIBS_NOFOUND})
     MESSAGE(FATAL_ERROR "Can't No found AIUI libs")
