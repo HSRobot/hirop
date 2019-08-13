@@ -19,9 +19,12 @@ PyBaseDetector::PyBaseDetector(PyObject *pClass, std::string detectorName){
         IErrorPrint("%s", "Python instance load failed: the class was null");
         return;
     }
+
     pClassInstance = PyObject_CallObject(pClass, NULL);
-    if(!pClassInstance)
+    if(!pClassInstance){
         IErrorPrint("%s", "Python Detector can't intance");
+        PyErr_Print();
+    }
 
     entityType = PYTHON;
     initNump();
@@ -181,7 +184,9 @@ int PyBaseDetector::getResult(std::vector<pose> &poses){
     p.position.x = T[0];
     p.position.y = T[1];
     p.position.z = T[2];
-
+    
+    std::cout << p.position.x << " "<< p.position.y<< " "<< p.position.z<< " "<< p.quaternion.x
+	<<" "<< p.quaternion.y<< " "<< p.quaternion.z <<" "<<p.quaternion.w<<std::endl; 
     poses.push_back(p);
 
     return 0;
