@@ -77,6 +77,10 @@ void CppLoader::getDetectorList(std::vector<std::string> &detectorList){
     BOOST_FOREACH(std::string path, libSerachPaths){
 
         boost::filesystem::path libDir(path);
+        if (! boost::filesystem::exists(libDir)) {
+                continue;
+        }
+
         boost::filesystem::directory_iterator end;
 
         /**

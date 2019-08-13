@@ -10,7 +10,7 @@ INCLUDE_DIRECTORIES(include)
 add_definitions(-D__LINUX__)
 
 ## 设置安装路径
-set(CMAKE_INSTALL_PREFIX ${CMAKE_BINARY_DIR}/install)
+##set(CMAKE_INSTALL_PREFIX ${CMAKE_BINARY_DIR}/install)
 
 add_subdirectory(src)
 

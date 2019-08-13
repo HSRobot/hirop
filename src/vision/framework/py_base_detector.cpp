@@ -1,3 +1,5 @@
+#pragma GCC diagnostic ignored "-Wconversion-null"
+
 #include "vision/py_base_detector.h"
 #include "utils/idebug.h"
 #include "utils/py_lock_helper.h"
@@ -80,8 +82,10 @@ int PyBaseDetector::detection(){
 
 void PyBaseDetector::setColorImg(const cv::Mat &inputImg){
 
-    PyLockHelper lock;
+    if(inputImg.empty() == true)
+       return;
 
+    PyLockHelper lock;
     int rows =  inputImg.rows;
     int cols = inputImg.cols;
     int channels = inputImg.channels();
@@ -110,6 +114,9 @@ void PyBaseDetector::setDepthImg(const cv::Mat &inputImg){
     int rows =  inputImg.rows;
     int cols = inputImg.cols;
     int channels = inputImg.channels();
+
+    if(inputImg.empty() == true)
+       return;
 
     IDebug("rows = %d, cols = %d, channels = %d", rows, cols, channels);
 

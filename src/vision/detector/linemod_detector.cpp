@@ -8,7 +8,7 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/foreach.hpp>
 #include <fstream>
-
+#include <opencv2/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
 
 #define DEBUG
@@ -44,7 +44,7 @@ void LinemodDetector::initParam(){
     verbose_ = true;
 
 
-    static const int T_LVLS[] = {4, 15};
+    static const int T_LVLS[] = {4, 8};
     std::vector< cv::Ptr<cv::linemod::Modality> > modalities;
     modalities.push_back(new cv::linemod::ColorGradient());
     modalities.push_back(new cv::linemod::DepthNormal());
@@ -80,6 +80,7 @@ int LinemodDetector::loadData(const std::string path, const std::string objectNa
 
     // 加载平移选择矩阵表
     std::vector<cv::Mat> Rs_tmp, Ts_tmp, Ks_tmp;
+	std::cout<< " begin "<<std::endl;
     loadVectorMat(RsFileName, Rs_tmp, 3, 3);
     loadVectorMat(TsFileName, Ts_tmp, 1, 3);
     loadVectorMat(KsFileName, Ks_tmp, 3, 3);
@@ -131,7 +132,7 @@ void LinemodDetector::loadVectorMat(std::string &fileName, std::vector<cv::Mat> 
         tmpLine = boost::algorithm::erase_all_copy(tmpLine, "\n");
         tmpLine.erase(0, 1);
 
-        boost::split(rss, tmpLine, boost::is_any_of(" "));
+        boost::split(rss, tmpLine, boost::is_any_of("  "));
 
         cv::Mat_<double> tmpMat_(rows,cols);
 
@@ -178,13 +179,13 @@ int LinemodDetector::detection(){
     // 将深度图作为检测源
     sources.push_back(color);
     sources.push_back(depth);
-
+	cv::imwrite("show.jpg", color);
     /**
      * @brief matches 保存匹配成功的匹配对象
      */
     std::vector<cv::linemod::Match> matches;
 
-    detector_->match(sources, 93.0f, matches);
+    detector_->match(sources, 80.0f, matches);
 
     //将深度图转换为点云
     cv::Mat_<cv::Vec3f> depth_real_ref_raw;

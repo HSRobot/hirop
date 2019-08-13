@@ -10,8 +10,9 @@ string toString(T& t){
 }
 
 TODDetector::TODDetector():CBaseDetector("TODDetector", false){
-    TCCVSION = new TensorflowCCVisoin();
     LineDeTool = new LinemodDetector();
+
+    TCCVSION = new TensorflowCCVisoin();
     index = 0;
 
 
@@ -28,17 +29,23 @@ int TODDetector::loadData(const std::string path, const std::string objectName){
 //    TCCVSION->LoadModel(path);
     cout <<"path： " << path<< endl;
     cout <<"objectName：" <<objectName<<endl;
+	if( TCCVSION == nullptr ){
+		TCCVSION = new TensorflowCCVisoin();
+	}
+
+	if(LineDeTool == nullptr ){
+		LineDeTool = new LinemodDetector();
+	}	
 //LineDeTool->loadDatfaster_rcnn_inception_resnet_v2_atrous_coco-15000-20190726a(path , objectName);
     return 0;
 }
 void TODDetector::setColorImg(const cv::Mat &inputImg){
     if( inputImg.channels() != 3){
         std::cout << "************************** "<<std::endl;
-        std::cout << "warning the channel num is no "<< inputImg.channels()<< " "<< inputImg.depth()<<std::endl;
 //        assert(inputImg.channels() == 3);
-
-       std::cout <<"image size   "<<inputImg.cols<<" "<< inputImg.rows<<std::endl;
     }
+
+    std::cout <<"image size   "<<inputImg.cols<<" "<< inputImg.rows<<std::endl;
 
     //这里需要备注一下 识别的颜色类型为 RGB 通道
 
@@ -52,6 +59,7 @@ void TODDetector::setColorImg(const cv::Mat &inputImg){
 void TODDetector::setDepthImg(const cv::Mat &inputImg){
     cout<< "setDepthImg "<< inputImg.depth()<<endl;
     DepthImg = inputImg;
+
     // 深度滤波
     for( int i = 0; i < DepthImg.rows; i++){
         for( int j = 0; j < DepthImg.cols; j++){
@@ -117,7 +125,7 @@ int TODDetector::initParam(){
     ThisDetectionName = "TOD";
     ColorWidth = 480;
     ColorHeight = 270;
-    if( TCCVSION != nullptr)
+	if( TCCVSION != nullptr)
         TCCVSION->init(ColorWidth, ColorHeight);
 
 

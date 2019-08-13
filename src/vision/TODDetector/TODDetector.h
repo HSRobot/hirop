@@ -20,6 +20,7 @@ using namespace hirop_vision;
  * 移值tensorflow object detection 模块
  * 
  */
+using namespace hirop_vision;
 class TODDetector:public CBaseDetector{
 
 public:
