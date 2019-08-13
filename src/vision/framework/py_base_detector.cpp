@@ -1,3 +1,5 @@
+#pragma GCC diagnostic ignored "-Wconversion-null"
+
 #include "vision/py_base_detector.h"
 #include "utils/idebug.h"
 #include "utils/py_lock_helper.h"

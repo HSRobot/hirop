@@ -1,3 +1,4 @@
+## 寻找源码文件
 aux_source_directory(./ ASR_SRCS)
 aux_source_directory(./jsoncpp JSON_CPP_SRCS)
 
@@ -25,22 +26,24 @@ configure_file (
 )
 
 ## 导入AIUI相关的头文件路径
-INCLUDE_DIRECTORIES("${PORJECT_SOURCE_DIR}/include")
+INCLUDE_DIRECTORIES("${PROJECT_SOURCE_DIR}/include")
 
 # 使得工程可以找到通过cmake生成的头文件 aiui_config.h
 INCLUDE_DIRECTORIES(${PROJECT_BINARY_DIR})
 
 # 寻找AIUI的库
-FIND_LIBRARY(AIUI_LIBS aiui "${PORJECT_SOURCE_DIR}/3rds/libs")
+FIND_LIBRARY(AIUI_LIBS aiui "${PROJECT_SOURCE_DIR}/3rds/libs" NO_DEFAULT_PATH)
 
-if(${AIUI_LIBS_NOFOUND})
+if(NOT AIUI_LIBS)
     MESSAGE(FATAL_ERROR "Can't No found AIUI libs")
-endif(${AIUI_LIBS_NOFOUND})
+endif()
 
 #########################end AIUI configure################################
 
+## 定义target
 TARGET_LINK_LIBRARIES(hirop_asr ${AIUI_LIBS})
 
+## 生成Cmake配置文件
 CONFIGURE_FILE(hirop_asr.cmake.in ${PROJECT_BINARY_DIR}/hirop_asrConfig.cmake @ONLY)
 
 ## 安装cmake配置文件
@@ -52,6 +55,7 @@ INSTALL(DIRECTORY ${PROJECT_SOURCE_DIR}/3rds/include/ DESTINATION include/)
 ## 安装AIUI库文件
 INSTALL(DIRECTORY ${PROJECT_SOURCE_DIR}/3rds/libs/ DESTINATION lib/)
 
+## 安装库文件和头文件
 INSTALL(TARGETS hirop_asr
         EXPORT hirop_asr
         LIBRARY DESTINATION lib
