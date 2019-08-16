@@ -1,4 +1,4 @@
-## 支持C++11 因为Yaml-cpp使用了c++11
+# 支持C++11 因为Yaml-cpp使用了c++11
 add_definitions(-std=c++11)
 
 add_executable(train_test train_test.cpp)
@@ -33,3 +33,14 @@ target_link_libraries(asr_test
     hirop_asr)
 
 install(TARGETS asr_test DESTINATION bin)
+
+############################# Start Data Manager Test #############################
+
+add_executable(dm_test dm_test.cpp)
+
+target_link_libraries(dm_test
+    hirop_datamanager)
+
+install(TARGETS dm_test DESTINATION bin)
+
+############################# End Data Manager Test #############################
