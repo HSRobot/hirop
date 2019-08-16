@@ -1,4 +1,4 @@
-objectName: cokecan3
+objectName: cokecan4
 trainerName: Linemod
 parameters:
-  stlFile: /home/fshs/coke.stl
+  stlFile: /home/fshs/hirop_vision/data/train_data/coke1.stl

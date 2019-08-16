@@ -64,6 +64,7 @@ void TODDetector::setDepthImg(const cv::Mat &inputImg){
     cout<< "setDepthImg "<< inputImg.depth()<<endl;
     DepthImg = inputImg;
 
+    // 深度滤波
     for( int i = 0; i < DepthImg.rows; i++){
         for( int j = 0; j < DepthImg.cols; j++){
             short val = DepthImg.at<ushort>(i,j);
@@ -132,9 +133,15 @@ int TODDetector::initParam(){
         TCCVSION->init(ColorWidth, ColorHeight);
 
 
+
     LineDeTool->loadData("/home/fshs/hirop_vision/data/TOD/coke","milk","stl");
     TCCVSION->LoadModel("/home/fshs/KongWork/pb/20190814-coke-1.pb");
 //    TCCVSION->LoadModel("/home/fshs/KongWork/pb/faster_rcnn_inception_resnet_v2_atrous_coco-15000-20190726.pb");
+=======
+    //LineDeTool->loadData("/home/fshs/hirop_vision/data/TOD/milk12","milk","ply");
+    //TCCVSION->LoadModel("/home/fshs/KongWork/pb/20190802-mobilenet-100000.pb");
+    //TCCVSION->LoadModel("/home/fshs/KongWork/pb/frozen_inference_graph-20190713-2.pb");
+
     name = "TODDetection";
     outPose = vector<float>(6);
     return 0;
@@ -290,13 +297,29 @@ int TODDetector::detection(){
      if( 0 == LineDeTool->detection()){
 
         LineDeTool->getResult(outposedd);
+
+        for( int i = 0; i < this->outposedd.size(); i++){
+            Eigen::Quaterniond CubeRotationShow =  Eigen::Quaterniond(outposedd[i].quaternion.w, outposedd[i].quaternion.x,\
+                                                                  outposedd[i].quaternion.y,outposedd[i].quaternion.z);
+            //"输出 Z-Y-X，即RPY  "
+            Eigen::Vector3d eulerAngle= CubeRotationShow.matrix().eulerAngles(2,1,0);
+            CubeRotationShow = Eigen::AngleAxisd(eulerAngle[2], Eigen::Vector3d::UnitZ()) *  \
+                    Eigen::AngleAxisd(eulerAngle[1]+1.57, Eigen::Vector3d::UnitY()) *  \
+                    Eigen::AngleAxisd(eulerAngle[0], Eigen::Vector3d::UnitX());
+
+            outposedd[i].quaternion.x = CubeRotationShow.x();
+            outposedd[i].quaternion.y = CubeRotationShow.y();
+            outposedd[i].quaternion.z = CubeRotationShow.z();
+            outposedd[i].quaternion.w = CubeRotationShow.w();
+        }
+
         IDebug("%s ", " find ................");
      }else{
 		outposedd.clear();
         IDebug("%s ", " non - find ................");
 		return -1;
      }
-    pose p1;
+
 	std::cout << tvec.at<double>(1,0)<<std::endl;
 	//p1.position.x = tvec.at<float>(0); 
 	//p1.position.y = tvec.at<float>(1);
@@ -324,6 +347,7 @@ int TODDetector::detection(){
 	outposedd[0].position.z = SumDistance / disArray.size();
 
 	cout << " pnp: "<< tvec.at<float>(0)  << " "<< tvec.at<float>(1) <<" "<<p1.position.z<<endl; 
+
 
 
     return 0;

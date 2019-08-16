@@ -1,0 +1,12 @@
+FIND_LIBRARY(hirop_datamanager_LIBRARY hirop_datamanager
+    PATHS @CMAKE_INSTALL_PREFIX@/lib
+    NO_DEFAULT_PATH
+)
+SET(hirop_datamanager_LIBRARIES ${hirop_datamanager_LIBRARY})
+
+FIND_PATH(hirop_asr_INCLUDE_DIR hirop/datamanager/hdata.h
+    PATHS @CMAKE_INSTALL_PREFIX@/include/
+    NO_DEFAULT_PATH
+)
+
+SET(hirop_datamanager_INCLUDE_DIRS ${hirop_datamanager_INCLUDE_DIR})

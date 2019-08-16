@@ -1,3 +1,5 @@
+#pragma GCC diagnostic ignored "-Wconversion-null"
+
 #include "vision/py_base_detector.h"
 #include "utils/idebug.h"
 #include "utils/py_lock_helper.h"
@@ -19,9 +21,12 @@ PyBaseDetector::PyBaseDetector(PyObject *pClass, std::string detectorName){
         IErrorPrint("%s", "Python instance load failed: the class was null");
         return;
     }
+
     pClassInstance = PyObject_CallObject(pClass, NULL);
-    if(!pClassInstance)
+    if(!pClassInstance){
         IErrorPrint("%s", "Python Detector can't intance");
+        PyErr_Print();
+    }
 
     entityType = PYTHON;
     initNump();
@@ -77,8 +82,10 @@ int PyBaseDetector::detection(){
 
 void PyBaseDetector::setColorImg(const cv::Mat &inputImg){
 
-    PyLockHelper lock;
+    if(inputImg.empty() == true)
+       return;
 
+    PyLockHelper lock;
     int rows =  inputImg.rows;
     int cols = inputImg.cols;
     int channels = inputImg.channels();
@@ -107,6 +114,9 @@ void PyBaseDetector::setDepthImg(const cv::Mat &inputImg){
     int rows =  inputImg.rows;
     int cols = inputImg.cols;
     int channels = inputImg.channels();
+
+    if(inputImg.empty() == true)
+       return;
 
     IDebug("rows = %d, cols = %d, channels = %d", rows, cols, channels);
 
@@ -181,7 +191,9 @@ int PyBaseDetector::getResult(std::vector<pose> &poses){
     p.position.x = T[0];
     p.position.y = T[1];
     p.position.z = T[2];
-
+    
+    std::cout << p.position.x << " "<< p.position.y<< " "<< p.position.z<< " "<< p.quaternion.x
+	<<" "<< p.quaternion.y<< " "<< p.quaternion.z <<" "<<p.quaternion.w<<std::endl; 
     poses.push_back(p);
 
     return 0;
