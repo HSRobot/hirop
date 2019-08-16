@@ -6,6 +6,7 @@ set(ABSL_DIR /home/fshs/KongWork/TOD_install/tensorflow/downloads/absl) #下载�
 set(Protobuf_DIR /home/fshs/KongWork/TOD_install/protobuf-3.6.0/install)  #3.6.0
 set(tesnsorflow_DIRS /home/fshs/KongWork/TOD_install/tensorflow) #tensorflow本身的目录
 find_package(VTK 6.2 REQUIRED)
+find_package(Eigen3 REQUIRED)
 add_definitions(-std=c++11)
 include_directories(${TOD_name}
     ${tesnsorflow_DIRS}/include
