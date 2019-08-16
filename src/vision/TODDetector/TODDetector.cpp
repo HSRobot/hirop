@@ -292,15 +292,17 @@ int TODDetector::detection(){
         LineDeTool->getResult(outposedd);
         IDebug("%s ", " find ................");
      }else{
+		outposedd.clear();
         IDebug("%s ", " non - find ................");
+		return -1;
      }
-	pose p1;
+    pose p1;
 	std::cout << tvec.at<double>(1,0)<<std::endl;
 	//p1.position.x = tvec.at<float>(0); 
 	//p1.position.y = tvec.at<float>(1);
 	vector<double> disArray;
-	circle(ColorZero, Point(rRoi.x,rRoi.y),50,Scalar(255,255,0) );
-	circle(ColorZero, Point(p22.x,p22.y),50,Scalar(255,255,0) );
+	//circle(ColorZero, Point(rRoi.x,rRoi.y),50,Scalar(255,255,0) );
+	//circle(ColorZero, Point(p22.x,p22.y),50,Scalar(255,255,0) );
 	int centerX = rRoi.x + rRoi.width/2;
 	int centerY = rRoi.y + rRoi.height/2;	
 
@@ -319,10 +321,10 @@ int TODDetector::detection(){
 		SumDistance += disArray[i];
 	}
 	cout << "sum "<< SumDistance <<endl;
-	//p1.position.z = SumDistance / disArray.size();
+	outposedd[0].position.z = SumDistance / disArray.size();
 
 	cout << " pnp: "<< tvec.at<float>(0)  << " "<< tvec.at<float>(1) <<" "<<p1.position.z<<endl; 
-	//outposedd.push_back(p1);
+
 
     return 0;
 }

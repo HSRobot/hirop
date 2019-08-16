@@ -469,7 +469,7 @@ void LinemodDetector::RT2Pose(const cv::Matx33f &R, const cv::Vec3f &T, pose &po
     pose.quaternion.x = 0;
     pose.quaternion.y = 0;
     pose.quaternion.z = 0;
-    pose.quaternion.w = 0;
+    pose.quaternion.w = 1;
 
     pose.position.x = T(0);
     pose.position.y = T(1);
