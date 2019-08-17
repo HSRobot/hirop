@@ -26,6 +26,29 @@ public:
      */
     virtual int saveData(HData *data, DataUri &uri) = 0;
 
+    /**
+     * @brief deletData 删除指定数据
+     * @param uri       数据的uri
+     * @return          0 成功 -1 失败
+     */
+    virtual int deleteData(DataUri &uri) = 0;
+
+    /**
+     * @brief getAllDatas   获取指定uri下的所有数据
+     * @param uri[in]           uri
+     * @param datas[out]         数据
+     * @return  0 成功 -1 失败
+     */
+    virtual int getAllDatas(DataUri &uri, std::vector<HData*> &datas) = 0;
+
+    /**
+     * @brief listUri       获取指定uri下的所有uri
+     * @param uri[in]       指定的uri
+     * @param uris[out]     所有的uri
+     * @return              0 成功 -1 失败
+     */
+    virtual int listUri(DataUri &uri, std::vector<DataUri> &uris) = 0;
+
 };
 
 }

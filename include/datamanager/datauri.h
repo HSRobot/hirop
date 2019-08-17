@@ -14,6 +14,15 @@ class DataUri{
 
 public:
 
+    /**
+     * @brief DataUri   创建一个不带名称的uri
+     */
+    DataUri(){}
+
+    /**
+     * @brief DataUri   创建一个带名称的uri
+     * @param name      uri的名称
+     */
     DataUri(std::string name);
 
     /**

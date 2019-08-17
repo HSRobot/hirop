@@ -56,6 +56,24 @@ public:
      */
     int saveRawData(std::string raw, DataUri &uri);
 
+    /**
+     * @brief deleteData    删除指定数据
+     * @param uri           数据的uri
+     * @return              0 成功 -1 失败
+     */
+    int deleteData(DataUri &uri);
+
+    /**
+     * @brief getAllDatas   获取指定uri路径下的所有data
+     * @param uri[in]
+     * @param datas[out]
+     * @return      0 成功 -1 失败
+     */
+    int getAllDatas(DataUri &uri, std::vector<HData *> &datas);
+
+
+    int listUri(DataUri &uri, std::vector<DataUri> &uris);
+
 private:
     /**
      * @brief _basePath     搜索的根路径

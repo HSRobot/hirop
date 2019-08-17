@@ -17,6 +17,9 @@ HData* FileDataWriter::loadData(DataUri &uri) {
 
     std::string raw = loadRawData(uri);
 
+    if(raw == "")
+        return NULL;
+
     HData * data = HData::fromBuffer(raw);
 
     return data;
@@ -31,7 +34,7 @@ std::string FileDataWriter::loadRawData(DataUri &uri){
     std::ifstream ifile(fileName.c_str());
 
     if(ifile.fail()){
-        return NULL;
+        return "";
     }
 
     std::stringstream dataStr;
@@ -48,7 +51,7 @@ int FileDataWriter::saveData(HData *data, DataUri &uri){
 
 int FileDataWriter::saveRawData(std::string raw, DataUri &uri){
 
-    const std::string uriStr = uri.toStr();
+    std::string uriStr = uri.toStr();
     std::string dataName = uri.getName();
 
     std::string path = _basePath + "/" + uriStr;
@@ -64,6 +67,64 @@ int FileDataWriter::saveRawData(std::string raw, DataUri &uri){
     file << raw;
 
     file.close();
+
+    return 0;
+}
+
+int FileDataWriter::deleteData(DataUri &uri){
+
+    std::string uriStr = uri.toStr();
+    std::string name = uri.getName();
+    std::string path = _basePath + "/" + uriStr + name;
+
+    if( !boost::filesystem::exists(path))
+        return -1;
+
+    return boost::filesystem::remove(path);
+}
+
+int FileDataWriter::getAllDatas(DataUri &uri, std::vector<HData *> &datas){
+
+    std::vector<DataUri> uris;
+
+    listUri(uri, uris);
+
+    for(int i = 0; i < uris.size(); i++){
+        HData *data = loadData(uris[i]);
+        if(data != NULL)
+            datas.push_back(data);
+    }
+
+    return 0;
+}
+
+int FileDataWriter::listUri(DataUri &uri, std::vector<DataUri> &uris){
+
+    std::string uriStr = uri.toStr();
+    std::string pathStr = _basePath + "/" + uriStr;
+
+    boost::filesystem::directory_iterator end;
+
+    if(!boost::filesystem::exists(pathStr))
+        return -1;
+
+    /**
+     *  变量目录下的所有文件
+     */
+    for(boost::filesystem::directory_iterator pos(pathStr); pos != end; ++pos){
+
+        if(boost::filesystem::is_directory(*pos)){
+            continue;
+        }
+
+        /**
+         * 通过构建uri的方式来获取data 该方法并不完善
+         */
+        DataUri tmpUri(pos->path().filename().string());
+        tmpUri.setUriFromStr(uriStr);
+
+        uris.push_back(tmpUri);
+    }
 
     return 0;
 }
