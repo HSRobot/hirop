@@ -45,18 +45,18 @@ void LinemodDetector::initParam(){
 
 
     //milk 12
-    param_n_points_ = 200;
+    param_n_points_ = 150;
     param_angle_step_ = 10;
     //scale 缩放比例
-    param_radius_min_ = 0.6;
-    param_radius_max_ = 1.3;
+    param_radius_min_ = 0.6; 
+    param_radius_max_ = 1.2;
     param_radius_step_ = 0.4;
-    param_width_ = 960;
-    param_height_ = 540;
-    param_focal_length_x_ = 525.0;//525
-    param_focal_length_y_ = 525.0;
+    param_width_ =640;
+    param_height_ = 480;
+    param_focal_length_x_ = 614.0;//525
+    param_focal_length_y_ = 614.0;
     param_near_ = 0.1; //0.1
-    param_far_ = 1000;
+    param_far_ = 100;
     // 训练器与识别器的参数应该是一致的
 
     //目标 点云距离
@@ -229,7 +229,7 @@ int LinemodDetector::detection(){
      */
     std::vector<cv::linemod::Match> matches;
     IDebug("%s","detector_->match ...............");
-    detector_->match(sources, 80.0f, matches);
+    detector_->match(sources, 81.0f, matches);
     IDebug("%s","detector_->match end........");
     IDebug("%s %d","detector size: ", matches.size());
     //将深度图转换为点云
@@ -237,7 +237,7 @@ int LinemodDetector::detection(){
     // cv::Mat depth_show;
     cv::Mat_<float> K, K_depth_;
     cv::Mat_<double> tmpMat_(3,3);
-    tmpMat_ << 527.6911 , 0, 478.74231, 0, 528.01282, 266.14407, 0, 0, 1;
+    tmpMat_ <<  617.94, 0, 325.894, 0, 614.1937, 247.2789, 0, 0, 1;
     K_depth_ = tmpMat_;
     K_depth_.convertTo(K, CV_32F);
     IDebug("%s","detector ready ...............");
@@ -255,10 +255,7 @@ int LinemodDetector::detection(){
      * @brief BOOST_FOREACH 遍历刚刚使用linemod模板匹配到所有匹配对象
      */
     BOOST_FOREACH(const cv::linemod::Match & match, matches){
-        if(match.template_id == 6147 || match.template_id == 109  ){
-            continue;
-        }
-        const std::vector<cv::linemod::Template>& templates =
+         const std::vector<cv::linemod::Template>& templates =
                 detector_->getTemplates(match.class_id, match.template_id);
         cv::Matx33d R_match;
         cv::Vec3d T_match;
@@ -269,7 +266,7 @@ int LinemodDetector::detection(){
         T_match = Ts_.at(match.class_id)[match.template_id].clone();
         D_match = distances_.at(match.class_id)[match.template_id];
         K_match = Ks_.at(match.class_id)[match.template_id];
-        std::cout << match.x <<" "<< match.y<< " id :"<< match.template_id<<" "<<match.similarity<<std::endl;
+        //std::cout << match.x <<" "<< match.y<< " id :"<< match.template_id<<" "<<match.similarity<<std::endl;
         // cv::circle(color, cv::Point(match.x, match.y), 5,cv::Scalar(255,0,255));
 
     
@@ -327,9 +324,9 @@ int LinemodDetector::detection(){
         rect_ref.x += match.x;
         rect_ref.y += match.y;
         // IDebug("%s %d %d","rect_ref width heigh ", rect_ref.width, rect_ref.height);
-        cv::Mat testImg = color.clone();
-        imshow("testImg",testImg(rect_ref));
-        cv::waitKey(0);
+        //cv::Mat testImg = color.clone();
+        //imshow("testImg",testImg(rect_ref));
+        //cv::waitKey(0);
         /**
          *  求图像深度图与rect_ref两个矩形的相交
          */
@@ -464,10 +461,15 @@ void LinemodDetector::RT2Pose(const cv::Matx33f &R, const cv::Vec3f &T, pose &po
     Eigen::Quaterniond q(t_R);
     Eigen::Vector4d q_tmp = q.coeffs();
 
-    pose.quaternion.x = q_tmp[0];
-    pose.quaternion.y = q_tmp[1];
-    pose.quaternion.z = q_tmp[2];
-    pose.quaternion.w = q_tmp[3];
+    //pose.quaternion.x = q_tmp[0];
+    //pose.quaternion.y = q_tmp[1];
+    //pose.quaternion.z = q_tmp[2];
+    //pose.quaternion.w = q_tmp[3];
+
+    pose.quaternion.x = 0;
+    pose.quaternion.y = 0;
+    pose.quaternion.z = 0;
+    pose.quaternion.w = 1;
 
     pose.position.x = T(0);
     pose.position.y = T(1);
@@ -481,8 +483,8 @@ int LinemodDetector::getResult(std::vector<pose> &poses){
     //                                                           poses[i].quaternion.y,poses[i].quaternion.z);
     //     //"输出 Z-Y-X，即RPY  "
     //     Eigen::Vector3d eulerAngle= CubeRotationShow.matrix().eulerAngles(2,1,0);
-    //     CubeRotationShow = Eigen::AngleAxisd(eulerAngle[0]-1.57, Eigen::Vector3d::UnitX()) *  \                  
-    //             Eigen::AngleAxisd(eulerAngle[1], Eigen::Vector3d::UnitY()) *  \                 
+    //     CubeRotationShow = Eigen::AngleAxisd(eulerAngle[0]-1.57, Eigen::Vector3d::UnitX()) *                    
+    //             Eigen::AngleAxisd(eulerAngle[1], Eigen::Vector3d::UnitY()) *                   
     //             Eigen::AngleAxisd(eulerAngle[2], Eigen::Vector3d::UnitY());
 
     //     poses[i].quaternion.x = CubeRotationShow.x();
@@ -506,8 +508,11 @@ int LinemodDetector::getResult(std::vector<pose> &poses){
 
 void LinemodDetector::setDepthImg(const cv::Mat &inputImg){
     // 保存输入的图像
-    depth_.release();
-    depth_ = inputImg;
+    if( inputImg.cols != param_width_ || param_height_ != inputImg.rows){
+        cv::resize(inputImg, depth_, cv::Size(param_width_, param_height_));
+    }else{
+        depth_ = inputImg;
+    }
 }
 
 void LinemodDetector::setColorImg(const cv::Mat &inputImg){

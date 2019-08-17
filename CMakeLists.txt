@@ -12,4 +12,4 @@ add_definitions(-D__LINUX__)
 
 add_subdirectory(src)
 
-add_subdirectory(test)
+#add_subdirectory(test)
