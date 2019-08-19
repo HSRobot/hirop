@@ -2,6 +2,10 @@ cmake_minimum_required(VERSION 3.5)
 
 set(TOD_name TODDetector)
 ##########################
+
+FIND_PACKAGE(object_recognition_renderer REQUIRED)
+INCLUDE_DIRECTORIES(${object_recognition_renderer_INCLUDE_DIRS})
+
 set(ABSL_DIR /home/fshs/KongWork/TOD_install/tensorflow/downloads/absl) #下载目录
 set(Protobuf_DIR /home/fshs/KongWork/TOD_install/protobuf-3.6.0/install)  #3.6.0
 set(tesnsorflow_DIRS /home/fshs/KongWork/TOD_install/tensorflow) #tensorflow本身的目录
