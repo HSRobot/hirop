@@ -12,6 +12,6 @@ INSTALL(TARGETS LinemodDetector DESTINATION lib)
 ############################ Start Simaple Detector ############################
 
 ADD_LIBRARY(SimapleDetector SHARED simaple_detector.cpp)
-INSTALL(TARGETS LinemodDetector DESTINATION lib)
+INSTALL(TARGETS SimapleDetector DESTINATION lib)
 
 ############################ End Simaple Detector ############################

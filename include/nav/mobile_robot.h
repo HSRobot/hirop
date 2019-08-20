@@ -6,7 +6,7 @@
 
 #include <boost/thread.hpp>
 
-#include <msgs/odometry.h>
+#include "../msgs/odometry.h"
 
 #include "motion.h"
 

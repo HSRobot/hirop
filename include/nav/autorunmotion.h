@@ -2,7 +2,7 @@
 
 #include "motion.h"
 
-#include <msgs/posestamped.h>
+#include "../msgs/posestamped.h"
 
 #include <actionlib/client/simple_action_client.h>
 #include <move_base_msgs/MoveBaseAction.h>

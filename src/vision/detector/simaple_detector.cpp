@@ -11,7 +11,8 @@ int SimapleDetector::getResult(std::vector<pose> &poses){
 }
 
 int SimapleDetector::detection(){
-    cv::imwrite("test.jpg", _colorImg);
+    cv::imwrite("/tmp/test.jpg", _colorImg);
+    return 0;
 }
 
 void SimapleDetector::setColorImg(const cv::Mat &inputImg){
