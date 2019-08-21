@@ -40,7 +40,6 @@ Motion::RETURN_TYPE LinearMotion::update(){
     _cmdvel.linear.x = 0.5;
 
     return CONTINUE;
-
 }
 
 

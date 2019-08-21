@@ -38,7 +38,7 @@ int MobileRobot::stopMotion(){
 
 }
 
-int MobileRobot::runMotion(Motion *motion){
+int MobileRobot::runMotion(Motion *motion, bool block){
 
     if(_motionThread != NULL){
         return -1;
@@ -46,13 +46,18 @@ int MobileRobot::runMotion(Motion *motion){
 
     _motion = motion;
 
-    /**
-     * 通过线程来启动motion
-     */
-    boost::function0<void> f =  boost::bind(&MobileRobot::__runMotion,this,  motion);
+    if(block)
+        __runMotion(motion);
+    else{
 
-    _motionThread = new boost::thread(f);
-    _motionThread->timed_join(boost::posix_time::microseconds(1));
+        /**
+         * 通过线程来启动motion
+         */
+        boost::function0<void> f =  boost::bind(&MobileRobot::__runMotion,this,  motion);
+
+        _motionThread = new boost::thread(f);
+        _motionThread->timed_join(boost::posix_time::microseconds(1));
+    }
 
 }
 

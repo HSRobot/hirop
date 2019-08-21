@@ -31,9 +31,11 @@ public:
 
     /**
      * @brief runMotion     执行运动
-     * @return
+     * @param motion        需要执行的运动
+     * @param block         是否阻塞执行
+     * @return              0 成功 -1 失败
      */
-    int runMotion(Motion *motion);
+    int runMotion(Motion *motion, bool block = true);
 
     /**
      * @brief setListener   设置监听者
