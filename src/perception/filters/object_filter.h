@@ -101,9 +101,11 @@ private:
     ros::Subscriber _objectSub;
 
     /**
-     * @brief radius        物体的半径
+     *
      */
-    float radius;
+    float hight;
+    float width;
+    float length;
 
     /**
      * 物体区域的XYZ最大最小值

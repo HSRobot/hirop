@@ -4,17 +4,18 @@
 
 using namespace hirop_perception;
 
+float ObjectFilter::minX = 0;
+float ObjectFilter::maxX = 0;
+float ObjectFilter::minZ = 0;
+float ObjectFilter::maxZ = 0;
+float ObjectFilter::minY = 0;
+float ObjectFilter::maxY = 0;
+
 ObjectFilter::ObjectFilter(){
 
-    minX = 0;
-    minY = 0;
-    minZ = 0;
+    _n = ros::NodeHandle();
 
-    maxX = 0;
-    maxY = 0;
-    maxZ = 0;
-
-    _objectSub = _n.subscribe("/object_array", 1, &ObjectFilter::objectDetectionCallback, this);
+    std::cout << "in Object Filter" << std::endl;
 
 }
 
@@ -23,7 +24,9 @@ ObjectFilter::~ObjectFilter(){
 }
 
 void ObjectFilter::declare_params(ecto::tendrils &params){
-    params.declare<float>("radius", "object radius", 0.1);
+    params.declare<float>("hight", "object hight", 0.1);
+    params.declare<float>("width", "object width", 0.1);
+    params.declare<float>("length", "object length", 0.1);
 }
 
 void ObjectFilter::declare_io(const ecto::tendrils &params, ecto::tendrils &in, ecto::tendrils &out){
@@ -32,7 +35,10 @@ void ObjectFilter::declare_io(const ecto::tendrils &params, ecto::tendrils &in, 
 }
 
 void ObjectFilter::configure(const ecto::tendrils &params, const ecto::tendrils &inputs, const ecto::tendrils &outputs){
-    radius = params.get<float>("radius");
+    hight = params.get<float>("hight");
+    width = params.get<float>("width");
+    length = params.get<float>("length");
+    _objectSub = _n.subscribe("/object_array", 1, &ObjectFilter::objectDetectionCallback, this);
 }
 
 int ObjectFilter::process(const ecto::tendrils &in, const ecto::tendrils &out){
@@ -63,6 +69,8 @@ void ObjectFilter::objectDetectionCallback(const vision_bridge::ObjectArray::Con
 
     tf::TransformListener listener;
 
+    std::cout << "in objectDetectionCallback" << std::endl;
+
     for(int i = 0; i < 5; i++){
 
         try{
@@ -79,13 +87,13 @@ void ObjectFilter::objectDetectionCallback(const vision_bridge::ObjectArray::Con
 
     }
 
-    minX = worldPose.pose.position.x - radius;
-    minY = worldPose.pose.position.y - radius;
-    minZ = worldPose.pose.position.z - radius;
+    minX = worldPose.pose.position.x - width/2;
+    minY = worldPose.pose.position.y - length/2;
+    minZ = worldPose.pose.position.z - hight/2;
 
-    maxX = worldPose.pose.position.x + radius;
-    maxY = worldPose.pose.position.y + radius;
-    maxZ = worldPose.pose.position.z + radius;
+    maxX = worldPose.pose.position.x + width/2;
+    maxY = worldPose.pose.position.y + length/2;
+    maxZ = worldPose.pose.position.z + hight/2;
 
 }
 
@@ -96,10 +104,11 @@ void ObjectFilter::FiltersDispatch::operator()(boost::shared_ptr<const pcl::Poin
 
     int size = cloud->points.size();
     for(int i = 0; i < size; i++){
-        if(cloud->points[i].z < minZ && cloud->points[i].z > maxZ \
-                && cloud->points[i].x < minX && cloud->points[i].x > maxX \
-                && cloud->points[i].y < minY && cloud->points[i].y > maxY)
-            outPointCloud->points.push_back(cloud->points[i]);
+        if(cloud->points[i].z > minZ && cloud->points[i].z < maxZ \
+                && cloud->points[i].x > minX && cloud->points[i].x < maxX \
+                && cloud->points[i].y > minY && cloud->points[i].y < maxY)
+            continue;
+        outPointCloud->points.push_back(cloud->points[i]);
     }
 
     outPointCloud->width = 1;
