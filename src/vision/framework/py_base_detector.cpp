@@ -39,7 +39,7 @@ PyBaseDetector::~PyBaseDetector(){
 
 }
 
-int PyBaseDetector::initNump(){
+void PyBaseDetector::initNump(){
     import_array();
 }
 

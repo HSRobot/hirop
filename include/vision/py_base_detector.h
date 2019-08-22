@@ -89,7 +89,7 @@ public:
     int isMultiDetector();
 
 private:
-    int initNump();
+    void initNump();
 
 private:
     PyObject *pClass;

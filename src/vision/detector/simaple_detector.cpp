@@ -7,11 +7,11 @@ SimapleDetector::SimapleDetector():CBaseDetector("LinemodDetector", false){
 }
 
 int SimapleDetector::getResult(std::vector<pose> &poses){
-
+	return 0;
 }
 
 int SimapleDetector::detection(){
-    cv::imwrite("/tmp/test.jpg", _colorImg);
+    cv::imwrite("/home/de/test.jpg", _colorImg);
     return 0;
 }
 

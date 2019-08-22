@@ -1,5 +1,5 @@
 ## 使用PYthon3版本
-FIND_PACKAGE(Python 3 COMPONENTS Development)
+FIND_PACKAGE(Python 2 COMPONENTS Development)
 
 ## 使用opnecv
 FIND_PACKAGE(OpenCV REQUIRED)
@@ -13,7 +13,7 @@ IF(${Python_FOUND})
 ELSEIF(${PYTHON_INCLUDE_PATH})
 	INCLUDE_DIRECTORIES(${PYTHON_INCLUDE_PATH})
 ELSE()
-	INCLUDE_DIRECTORIES(/usr/include/python3.5/)
+	INCLUDE_DIRECTORIES(/usr/include/python2.7/)
 ENDIF()
 
 ## 支持C++11 因为Yaml-cpp使用了c++11
@@ -26,6 +26,6 @@ add_subdirectory(framework)
 ## 检测器代码
 add_subdirectory(detector)
 ## 训练器代码
-add_subdirectory(trainer)
+#add_subdirectory(trainer)
 
 

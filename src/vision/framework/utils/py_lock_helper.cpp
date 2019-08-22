@@ -3,7 +3,7 @@
 PyLockHelper::PyLockHelper(){
 
     nStatus = 0;
-    nStatus = PyGILState_Check();
+   // nStatus = PyGILState_Check();
 
     if( !nStatus)
         gstate = PyGILState_Ensure();

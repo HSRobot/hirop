@@ -4,7 +4,7 @@ FIND_PACKAGE(HPlugin REQUIRED)
 
 ADD_LIBRARY(hirop_vision SHARED ${FRAMEWORK_SRCS} utils/py_lock_helper.cpp)
 
-TARGET_LINK_LIBRARIES(hirop_vision python3.5m
+TARGET_LINK_LIBRARIES(hirop_vision python2.7
     ${HPlugin_LIBRARIES}
     ${OpenCV_LIBRARIES}
     ${YAML_CPP_LIBRARIES}

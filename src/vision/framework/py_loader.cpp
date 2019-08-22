@@ -9,7 +9,7 @@ using namespace hirop_vision;
 
 PyLoader* PyLoader::instance = NULL;
 
-const std::string PyLoader::PATH = "/home/fshs/KongWork/YOLO6d";
+const std::string PyLoader::PATH = "/home/de/data/caffe_show/python2/";
 
 PyLoader* PyLoader::getPyLoader(){
     if(instance)
