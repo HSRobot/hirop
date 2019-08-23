@@ -117,6 +117,11 @@ private:
     static float minZ;
     static float maxZ;
 
+    /**
+     * @brief _worldFrameId 世界坐标的名称
+     */
+    std::string _worldFrameId;
+
 };
 
 }

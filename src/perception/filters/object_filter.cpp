@@ -12,11 +12,7 @@ float ObjectFilter::minY = 0;
 float ObjectFilter::maxY = 0;
 
 ObjectFilter::ObjectFilter(){
-
     _n = ros::NodeHandle();
-
-    std::cout << "in Object Filter" << std::endl;
-
 }
 
 ObjectFilter::~ObjectFilter(){
@@ -27,6 +23,7 @@ void ObjectFilter::declare_params(ecto::tendrils &params){
     params.declare<float>("hight", "object hight", 0.1);
     params.declare<float>("width", "object width", 0.1);
     params.declare<float>("length", "object length", 0.1);
+    params.declare<std::string>("frame_id", "The world frame id", "base_link");
 }
 
 void ObjectFilter::declare_io(const ecto::tendrils &params, ecto::tendrils &in, ecto::tendrils &out){
@@ -38,6 +35,8 @@ void ObjectFilter::configure(const ecto::tendrils &params, const ecto::tendrils 
     hight = params.get<float>("hight");
     width = params.get<float>("width");
     length = params.get<float>("length");
+    _worldFrameId = params.get<std::string>("frame_id");
+
     _objectSub = _n.subscribe("/object_array", 1, &ObjectFilter::objectDetectionCallback, this);
 }
 
@@ -74,8 +73,8 @@ void ObjectFilter::objectDetectionCallback(const vision_bridge::ObjectArray::Con
     for(int i = 0; i < 5; i++){
 
         try{
-            listener.waitForTransform("base_link", _objectCamPose.header.frame_id, ros::Time(0), ros::Duration(1.0));
-            listener.transformPose("base_link",_objectCamPose, worldPose);
+            listener.waitForTransform(_worldFrameId, _objectCamPose.header.frame_id, ros::Time(0), ros::Duration(1.0));
+            listener.transformPose(_worldFrameId, _objectCamPose, worldPose);
         }catch (tf::TransformException &ex) {
             /**
          * @brief 获取变换关系失败，等待1秒后继续获取坐标变换

@@ -27,22 +27,38 @@ void PointCloudRos::declare_io(const tendrils& params, tendrils& in, tendrils& o
 void PointCloudRos::configure(const tendrils& params, const tendrils& inputs, const tendrils& outputs){
 
     IDebug("configure");
-    std::string topicName;
 
     topicName = params.get<std::string>("topic_name");
     worldFrame = params.get<std::string>("world_frame");
 
-    pointCloudSub = mHandler.subscribe<sensor_msgs::PointCloud2>(topicName, 1, \
-                                                                 &PointCloudRos::pointCloudCallBack, this);
 }
 
 int PointCloudRos::process(const tendrils& in, const tendrils& out){
+
+    /**
+     *  当需要执行的时候，才开始订阅点云
+     */
+    pointCloudSub = mHandler.subscribe<sensor_msgs::PointCloud2>(topicName, 1, \
+                                                                 &PointCloudRos::pointCloudCallBack, this);
+
+    /**
+     *  等待点云的接收 等待5秒，如果还未收到点云，则重新执行该过滤器
+     */
+    for(int i = 0; i < 5; i++){
+        if(!havePointCloud)
+            ros::Duration(1.0).sleep();
+    }
 
     /**
      *  还未接收到点云，重复执行当前过滤器
      */
     if(!havePointCloud)
         return ecto::DO_OVER;
+
+    /**
+     *  当收到点云了，那么就先取消对点云的订阅以降低CPU占用率以及分布式的网络带宽
+     */
+    pointCloudSub.shutdown();
 
     tf::TransformListener listener;
     tf::StampedTransform transform;
@@ -103,7 +119,6 @@ void PointCloudRos::rosTf2Eigen(const tf::StampedTransform &transform, Eigen::Ve
     t(0) = transform.getOrigin().x();
     t(1) = transform.getOrigin().y();
     t(2) = transform.getOrigin().z();
-
 
     tf::Quaternion tmp;
     tmp = transform.getRotation();
