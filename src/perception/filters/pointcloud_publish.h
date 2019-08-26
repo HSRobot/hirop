@@ -51,6 +51,11 @@ private:
      */
     ecto::spore<std::string> _frameId;
 
+    /**
+     * @brief _topicName  保存点云topic name
+     */
+    ecto::spore<std::string> _topicName;
+
 
 };
 

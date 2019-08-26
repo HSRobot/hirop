@@ -45,8 +45,10 @@ int PointCloudRos::process(const tendrils& in, const tendrils& out){
      *  等待点云的接收 等待5秒，如果还未收到点云，则重新执行该过滤器
      */
     for(int i = 0; i < 5; i++){
-        if(!havePointCloud)
+        if(!havePointCloud){
             ros::Duration(1.0).sleep();
+            IDebug("Waiting for point cloud");
+        }
     }
 
     /**
@@ -55,10 +57,12 @@ int PointCloudRos::process(const tendrils& in, const tendrils& out){
     if(!havePointCloud)
         return ecto::DO_OVER;
 
+
     /**
      *  当收到点云了，那么就先取消对点云的订阅以降低CPU占用率以及分布式的网络带宽
      */
     pointCloudSub.shutdown();
+    havePointCloud = false;
 
     tf::TransformListener listener;
     tf::StampedTransform transform;
@@ -96,6 +100,8 @@ int PointCloudRos::process(const tendrils& in, const tendrils& out){
 }
 
 void PointCloudRos::pointCloudCallBack(const sensor_msgs::PointCloud2::ConstPtr & msg){
+
+    IDebug("Got point cloud");
 
     pcl::PCLPointCloud2* cloud = new pcl::PCLPointCloud2;
     pcl_conversions::toPCL(*msg, *cloud);

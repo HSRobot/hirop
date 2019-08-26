@@ -18,6 +18,9 @@ void PointCloudPublish::declare_params(ecto::tendrils &params){
     params.declare<std::string>(&PointCloudPublish::_frameId, "frame_id", \
                                 "The point cloud msg frame id").required(true);
 
+    params.declare<std::string>(&PointCloudPublish::_topicName, "topic_name", \
+                                "The publish point cloud topic name").required(true);
+
 }
 
 void PointCloudPublish::declare_io(const ecto::tendrils &params, ecto::tendrils &in, ecto::tendrils &out){
@@ -26,7 +29,7 @@ void PointCloudPublish::declare_io(const ecto::tendrils &params, ecto::tendrils 
 
 void PointCloudPublish::configure(const ecto::tendrils &params, const ecto::tendrils &inputs,
                                   const ecto::tendrils &outputs){
-    pointCloudPub = mHandler.advertise<sensor_msgs::PointCloud2>("/test/point", 1);
+    pointCloudPub = mHandler.advertise<sensor_msgs::PointCloud2>(*_topicName, 1);
 }
 
 template <typename Point>

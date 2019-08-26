@@ -75,15 +75,15 @@ void ObjectFilter::objectDetectionCallback(const vision_bridge::ObjectArray::Con
         try{
             listener.waitForTransform(_worldFrameId, _objectCamPose.header.frame_id, ros::Time(0), ros::Duration(1.0));
             listener.transformPose(_worldFrameId, _objectCamPose, worldPose);
+            break;
         }catch (tf::TransformException &ex) {
             /**
          * @brief 获取变换关系失败，等待1秒后继续获取坐标变换
          */
             ROS_ERROR("%s",ex.what());
             ros::Duration(1.0).sleep();
-            break;
+            continue;
         }
-
     }
 
     minX = worldPose.pose.position.x - width/2;
