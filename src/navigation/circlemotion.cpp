@@ -34,5 +34,4 @@ Motion::RETURN_TYPE CircleMotion::update(){
     _cmdvel.linear.x = _linearVel;
 
     return CONTINUE;
-
 }

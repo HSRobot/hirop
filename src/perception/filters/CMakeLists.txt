@@ -31,6 +31,15 @@ SET(SOURCES
         pointcloud_publish.cpp
 )
 
+SET(SOURCES
+        ${SOURCES}
+        object_filter.cpp
+)
+
+
+find_package(vision_bridge REQUIRED)
+INCLUDE_DIRECTORIES(${vision_bridge_INCLUDE_DIRS})
+
 ectomodule(hirop_perception DESTINATION ${CMAKE_LIBRARY_OUTPUT_DIRECTORY} INSTALL
     ${SOURCES}
 )

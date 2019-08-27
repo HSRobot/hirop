@@ -97,6 +97,11 @@ private:
      */
     std::string worldFrame;
 
+    /**
+     * @brief topicName     保存点云的话题名称
+     */
+    std::string topicName;
+
 };
 
 }
