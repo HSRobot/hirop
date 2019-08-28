@@ -89,7 +89,11 @@ public:
     int isMultiDetector();
 
 private:
+#ifdef WITH_PYTHON3
+    int initNump();
+#else
     void initNump();
+#endif
 
 private:
     PyObject *pClass;

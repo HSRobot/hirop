@@ -3,8 +3,9 @@
 PyLockHelper::PyLockHelper(){
 
     nStatus = 0;
-   // nStatus = PyGILState_Check();
-
+#ifdef WITH_PYTHON3
+    nStatus = PyGILState_Check();
+#endif
     if( !nStatus)
         gstate = PyGILState_Ensure();
 }

@@ -38,10 +38,15 @@ PyBaseDetector::~PyBaseDetector(){
         Py_DECREF(pClassInstance);
 
 }
-
+#ifdef WITH_PYTHON3
+int PyBaseDetector::initNump(){
+    import_array();
+}
+#else
 void PyBaseDetector::initNump(){
     import_array();
 }
+#endif
 
 int PyBaseDetector::loadData(const std::string path, const std::string objectName){
 
@@ -141,61 +146,51 @@ int PyBaseDetector::getResult(std::vector<pose> &poses){
         return -1;
     }
 
-    PyObject* ret =  PyObject_CallMethod(pClassInstance, "getResult", "");
+    PyObject* ret =  PyObject_CallMethod(pClassInstance, "getResult", nullptr);
 
     if(!ret)
         PyErr_Print();
 
-    PyObject *R_item = PyList_GetItem(ret, 0);
-    PyObject *T_item = PyList_GetItem(ret, 1);
+    //数组多少个维度？
+    PyArrayObject *ret_array;
+    PyArray_OutputConverter(ret, &ret_array);
+    //每个维度的长度  总长度 但是每一列的数据长度为7
+    npy_intp *shape = PyArray_SHAPE(ret_array);
+    double* pDataPtr = (double*)PyArray_DATA(ret_array);
+//    std::cout << "rows: "<< shape[0] << " cols: "<< shape[1]<<std::endl;
+    int rows = shape[0];
+    //有输出结果
+    if( rows >0 ){
+        poses.reserve(rows);
+        for (int i = 0; i < shape[0]; ++i) {
+            int row = i * shape[1];
+            pose p;
+            p.position.x = static_cast<double>(pDataPtr[row +0]);
+            p.position.y = static_cast<double>(pDataPtr[row + 1]);
+            p.position.z = static_cast<double>(pDataPtr[row + 2]);
+            p.quaternion.x = static_cast<double>(pDataPtr[row + 3]);
+            p.quaternion.y = static_cast<double>(pDataPtr[row + 4]);
+            p.quaternion.z = static_cast<double>(pDataPtr[row + 5]);
+            p.quaternion.w = static_cast<double>(pDataPtr[row + 6]);
 
-    cv::Mat_<float> R_mat(3,3);
+            poses.push_back(p);
 
-    double R[9];
-
-    {
-        PyArrayObject *array = (PyArrayObject *) R_item;
-        int rows = array->dimensions[0], columns = array->dimensions[1];
-        std::cout << "Rows = "  << rows << "columns ="<<  columns <<std::endl;
-        for( int Index_m = 0; Index_m < rows; Index_m++){
-            for(int Index_n = 0; Index_n < columns; Index_n++){
-                R[Index_m * 3 + Index_n] = *(float *)(array->data + Index_m * array->strides[0] + Index_n * array->strides[1]);
-            }
         }
-        R_mat << R[0],R[1],R[2],R[3],R[4],R[5],R[6],R[7],R[8];
+    }else{
+        pose p;
+        p.position.x = 0;
+        p.position.y = 0;
+        p.position.z = 0;
+        p.quaternion.x = 0;
+        p.quaternion.y = 0;
+        p.quaternion.z = 0;
+        p.quaternion.w = 0;
+        poses.push_back(p);
     }
 
-    double T[3];
-    {
-        PyArrayObject *array = (PyArrayObject *) T_item;
-        int rows = array->dimensions[0], columns = array->dimensions[1];
-        for( int Index_m = 0; Index_m < rows; Index_m++){
-            for(int Index_n = 0; Index_n < columns; Index_n++){
-                T[Index_m] = *(float *)(array->data + Index_m * array->strides[0] + Index_n * array->strides[1]);
-            }
-        }
-    }
-
-    pose p;
-
-    Eigen::Matrix3d t_R;
-    cv::cv2eigen((cv::Matx33d)R_mat, t_R);
-    Eigen::Quaterniond q(t_R);
-    Eigen::Vector4d q_tmp = q.coeffs();
-
-    p.quaternion.x = q_tmp[0];
-    p.quaternion.y = q_tmp[1];
-    p.quaternion.z = q_tmp[2];
-    p.quaternion.w = q_tmp[3];
-
-    p.position.x = T[0];
-    p.position.y = T[1];
-    p.position.z = T[2];
-    
-    std::cout << p.position.x << " "<< p.position.y<< " "<< p.position.z<< " "<< p.quaternion.x
-	<<" "<< p.quaternion.y<< " "<< p.quaternion.z <<" "<<p.quaternion.w<<std::endl; 
-    poses.push_back(p);
-
+    Py_DECREF(pDataPtr);
+    Py_DECREF(ret_array);
+    Py_DECREF(ret);
     return 0;
 }
 

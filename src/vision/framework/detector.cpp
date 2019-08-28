@@ -121,10 +121,9 @@ _detectionFaile:
 
 
 int Detector::setDetector(const std::string &name, const std::string &objectName, ENTITY_TYPE type, \
-                          std::string configFile){
+                           std::string configFile){
 
     int ret = 0;
-
     this->detectorName = name;
     this->objectName = objectName;
 
@@ -142,6 +141,8 @@ int Detector::setDetector(const std::string &name, const std::string &objectName
     if(detectorPtr != NULL)
         return 0;
 
+
+
     if(type == PYTHON)
         this->detectorPtr = pyLoader->loadDetector(name);
     else if(type == CPP)
@@ -153,13 +154,16 @@ int Detector::setDetector(const std::string &name, const std::string &objectName
     }
 
     if( !configFile.empty()){
-        IDebug("setting detector config");
+        std::cout << "configFile: "<<configFile<<std::endl;
         YAML::Node privateParam;
         Configure *config = new Configure(configFile);
         if(!config->getPrivateParams(privateParam)){
-            if(this->detectorPtr->parseConfig(privateParam)){
+            if(this->detectorPtr->parseConfig(privateParam) !=0 ){
+                IErrorPrint("Get parseConfig  NULL");
                 return -1;
             }
+        }else{
+            IErrorPrint("Get PrivateParam  NULL");
         }
     }
 

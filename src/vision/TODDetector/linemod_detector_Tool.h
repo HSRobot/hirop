@@ -14,7 +14,7 @@
 #include <object_recognition_renderer/utils.h>
 #include "vision.h"
 // #include "hplugin/hpluginloader.h"
-
+#include "yaml-cpp/yaml.h"
 using namespace hirop_vision;
 
 class LinemodDetector{
@@ -95,6 +95,8 @@ public:
      */
     void setColorImg(const cv::Mat &inputImg);
 
+    int readYamlData(const YAML::Node &node);
+
 private:
 
     /**
@@ -134,7 +136,6 @@ private:
     float icpCloudToCloud(const std::vector<cv::Vec3f> &pts_ref,\
                           std::vector<cv::Vec3f> &pts_model, \
                           cv::Matx33f& R, cv::Vec3f& T, float &px_inliers_ratio, int mode);
-
     /**
      * @brief       获取两个点云的欧式距离
      * @param
@@ -142,7 +143,6 @@ private:
      */
     float getL2distClouds(const std::vector<cv::Vec3f> &model,\
                           const std::vector<cv::Vec3f> &ref, float &dist_mean, const float mode=0);
-
     /**
      * @brief
      * @param
@@ -172,6 +172,7 @@ private:
      */
     void RT2Pose(const cv::Matx33f &R, const cv::Vec3f &T, pose &pose);
 
+
 private:
 
     /**
@@ -188,6 +189,8 @@ private:
     double param_far_;
     double param_focal_length_x_;
     double param_focal_length_y_;
+
+
     float th_obj_dist_;
     float verbose_;
 
@@ -217,6 +220,9 @@ private:
 
     // 保存识别成功后的位姿，由于可能在一张图片识别到多个一样的物体，所以采用vector
     std::vector<pose> poses;
+
+    cv::Mat tmpMat_;
+private:
 
 };
 

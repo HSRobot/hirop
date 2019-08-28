@@ -8,15 +8,12 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/foreach.hpp>
 #include <fstream>
-
+#include <opencv2/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 
 #define DEBUG
 #include <idebug.h>
 
-
-
-// LinemodDetector::LinemodDetector():CBaseDetector("LinemodDetector", false){
 LinemodDetector::LinemodDetector(){
     icp_dist_min_ = 0.04f;
     px_match_min_ = 0.25;
@@ -30,34 +27,6 @@ LinemodDetector::~LinemodDetector(){
 
 void LinemodDetector::initParam(){
 
-    // param_n_points_ = 200;
-    // param_angle_step_ = 10;
-    // //scale 缩放比例
-    // param_radius_min_ = 1.0;
-    // param_radius_max_ = 1.0;
-    // param_radius_step_ = 0.2;
-    // param_width_ = 960;
-    // param_height_ = 540;
-    // param_focal_length_x_ = 525.0;//525
-    // param_focal_length_y_ = 525.0;
-    // param_near_ = 0.1; //0.1
-    // param_far_ = 1000;
-
-
-    //milk 12
-    param_n_points_ = 150;
-    param_angle_step_ = 10;
-    //scale 缩放比例
-    param_radius_min_ = 0.6; 
-    param_radius_max_ = 1.2;
-    param_radius_step_ = 0.4;
-    param_width_ =640;
-    param_height_ = 480;
-    param_focal_length_x_ = 614.0;//525
-    param_focal_length_y_ = 614.0;
-    param_near_ = 0.1; //0.1
-    param_far_ = 100;
-    // 训练器与识别器的参数应该是一致的
 
     //目标 点云距离
     th_obj_dist_ = 0.02f;//0.04
@@ -68,32 +37,31 @@ void LinemodDetector::initParam(){
     std::vector< cv::Ptr<cv::linemod::Modality> > modalities;
     modalities.push_back(new cv::linemod::ColorGradient());
     modalities.push_back(new cv::linemod::DepthNormal());
-    // IDebug("%s %d %d", "T_LVLS loading data",T_LVLS,T_LVLS+2);
-    // std::vector<int> da = std::vector<int>(T_LVLS, T_LVLS +2);
+
     //Detector m默认构造函数 的话 第一个是形态 modalities 参数输入是彩色图或者是深度图 后面的是具体的形态的量化等级 
     detector_ = new cv::linemod::Detector(modalities, std::vector<int>(T_LVLS, T_LVLS +2));
 }
 
 int LinemodDetector::loadData(const std::string path, const std::string &objectName, const std::string &type){
 
-    IDebug("%s", "LinemodDetector loading data");
 
+    IDebug("%s", "LinemodDetector loading data");
     if(Rs_.count(objectName)){
         IDebug("The %s object data alreadly loaded", objectName.c_str());
         return 0;
     }
-
     meshPath = path +"/mesh."+ type;
     std::string RsFileName= path + "/RS.txt";
     std::string TsFileName= path + "/TS.txt";
     std::string KsFileName= path + "/KS.txt";
     std::string DistancesFileName= path + "/distances.txt";
+    std::string yamlConfigureName = path + "/settings.yaml";
 
     renderer_ = new Renderer3d(meshPath);
     renderer_->set_parameters(param_width_, param_height_,\
                               param_focal_length_x_, param_focal_length_y_, param_near_, param_far_);
 
-    IDebug("%s", "LinemodDetector is ok");
+
     
     renderer_iterator_ = new RendererIterator(renderer_, param_n_points_);
     renderer_iterator_->angle_step_ = param_angle_step_;
@@ -109,7 +77,7 @@ int LinemodDetector::loadData(const std::string path, const std::string &objectN
     loadVectorMat(TsFileName, Ts_tmp, 1, 3);
     loadVectorMat(KsFileName, Ks_tmp, 3, 3);
 
-	std::cout << "load Mat "<<std::endl;
+    //std::cout << "load Mat "<<std::endl;
     Rs_.insert(std::pair<std::string, std::vector<cv::Mat>>(objectName, Rs_tmp));
     Ts_.insert(std::pair<std::string, std::vector<cv::Mat>>(objectName, Ts_tmp));
     Ks_.insert(std::pair<std::string, std::vector<cv::Mat>>(objectName, Ks_tmp));
@@ -142,7 +110,7 @@ int LinemodDetector::loadData(const std::string path, const std::string &objectN
 
     if(detector_->classIds().empty())
         return -1;
-
+    IDebug("%s", "LinemodDetector load  ok");
     return 0;
 }
 
@@ -198,9 +166,7 @@ int LinemodDetector::detection(){
     if (depth_.depth() == CV_32F)
         depth_.convertTo(depth, CV_16UC1, 1000.0);
     else if(depth_.depth() == CV_8U){
-        // IDebug("the depth1_ depth is %d %d " , depth_.depth() ,depth_.channels());
         depth_.convertTo(depth, CV_16UC1, 1000.0);
-        // IDebug("the depth   depth is %d %d ", depth.depth(),depth.channels() );
     } else if(depth_.depth() == CV_16U){
         depth = depth_;
     }
@@ -212,10 +178,6 @@ int LinemodDetector::detection(){
 
     }
 
-    // if (color_.rows > 960)
-    //     cv::pyrDown(color_.rowRange(0, 960), color);
-    // else
-    //     color_.copyTo(color);
     color_.copyTo(color);
     // 将深度图作为检测源  不输入彩色图会出现 assert dept和dim >0 
     IDebug("the color_ size is %d %d " , color.rows, color.cols);
@@ -237,16 +199,17 @@ int LinemodDetector::detection(){
     // cv::Mat depth_show;
     cv::Mat_<float> K, K_depth_;
     cv::Mat_<double> tmpMat_(3,3);
-    tmpMat_ <<  617.94, 0, 325.894, 0, 614.1937, 247.2789, 0, 0, 1;
+    //tmpMat_ <<  617.94, 0, 325.894, 0, 614.1937, 247.2789, 0, 0, 1;
+    for( int i =0; i< tmpMat_.cols *tmpMat_.rows; i++){
+        tmpMat_ << tmpMat_.at<float>(i);
+    }
+
     K_depth_ = tmpMat_;
     K_depth_.convertTo(K, CV_32F);
-    IDebug("%s","detector ready ...............");
+
 #if CV_MAJOR_VERSION == 3
     std::cout << "depthTo3d : "<<depth.depth()<<" "<<depth.channels()<<std::endl;
-
     cv::rgbd::depthTo3d(depth, K, depth_real_ref_raw);
-    //点云显示
-
 #else
     cv::depthTo3d(depth, K, depth_real_ref_raw);
 #endif
@@ -470,10 +433,42 @@ void LinemodDetector::RT2Pose(const cv::Matx33f &R, const cv::Vec3f &T, pose &po
     pose.quaternion.y = 0;
     pose.quaternion.z = 0;
     pose.quaternion.w = 1;
-
     pose.position.x = T(0);
     pose.position.y = T(1);
     pose.position.z = T(2);
+
+}
+
+int LinemodDetector::readYamlData(const YAML::Node &node)
+{
+    try{
+      this->param_n_points_ = node["linemod"]["param_n_points_"].as<int>();
+      this->param_angle_step_ = node["linemod"]["param_angle_step_"].as<int>();
+      this->param_radius_min_ = node["linemod"]["param_radius_min_"].as<float>();
+      this->param_radius_max_ = node["linemod"]["param_radius_max_"].as<float>();
+      this->param_radius_step_ = node["linemod"]["param_radius_step_"].as<float>();
+      this->param_width_ = node["linemod"]["param_width_"].as<int>();
+      this->param_height_ = node["linemod"]["param_height_"].as<int>();
+      this->param_focal_length_x_ = node["linemod"]["param_focal_length_x_"].as<float>();
+      this->param_focal_length_y_ = node["linemod"]["param_focal_length_y_"].as<float>();
+      this->param_near_ = node["linemod"]["param_near_"].as<float>();
+      this->param_far_ = node["linemod"]["param_far_"].as<int>();
+      float temp3[9];
+      this->tmpMat_ = cv::Mat(cv::Size(3,3), CV_32FC1);
+      for(int i =0; i< 3;i++){
+          for(int j =0; j< 3;j++){
+          temp3[i*3+j]= node["linemod"]["tmpMat_"][i*3+j].as<float>();
+          this->tmpMat_.at<float>(i,j) = temp3[i*3+j];
+            }
+        }
+    }catch(YAML::Exception e)
+    {
+        std::cerr<<"Linemod YAML:" << e.msg<<std::endl;
+        return -1;
+    }
+
+    return 0;
+//      std::cout<<tmpMat_<<std::endl;
 
 }
 
@@ -486,7 +481,6 @@ int LinemodDetector::getResult(std::vector<pose> &poses){
     //     CubeRotationShow = Eigen::AngleAxisd(eulerAngle[0]-1.57, Eigen::Vector3d::UnitX()) *                    
     //             Eigen::AngleAxisd(eulerAngle[1], Eigen::Vector3d::UnitY()) *                   
     //             Eigen::AngleAxisd(eulerAngle[2], Eigen::Vector3d::UnitY());
-
     //     poses[i].quaternion.x = CubeRotationShow.x();
     //     poses[i].quaternion.y = CubeRotationShow.y();
     //     poses[i].quaternion.z = CubeRotationShow.z();
@@ -494,7 +488,6 @@ int LinemodDetector::getResult(std::vector<pose> &poses){
     // }
      
     poses = this->poses;
-
 
     if(poses.empty())
         return -1;
@@ -523,7 +516,6 @@ void LinemodDetector::setColorImg(const cv::Mat &inputImg){
         color_ = inputImg;
     }
 
-    // color_ = inputImg;
 }
 
 
@@ -716,6 +708,3 @@ float LinemodDetector::matToVec(const cv::Mat_<cv::Vec3f> &src_ref, const cv::Ma
         ratio = static_cast<float>(px_missing) /static_cast<float>(pts_ref.size());
     return ratio;
 }
-
-
-// H_EXPORT_PLUGIN(LinemodDetector, "LinemodDetector", "1.0")
