@@ -65,14 +65,14 @@ void TODDetector::setDepthImg(const cv::Mat &inputImg){
     DepthImg = inputImg;
 
     // 深度滤波
-    for( int i = 0; i < DepthImg.rows; i++){
-        for( int j = 0; j < DepthImg.cols; j++){
-            short val = DepthImg.at<ushort>(i,j);
-            if( val > 1000){
-                DepthImg.at<ushort>(i,j) = 0;
-            }
-        }
-    }
+//    for( int i = 0; i < DepthImg.rows; i++){
+//        for( int j = 0; j < DepthImg.cols; j++){
+//            short val = DepthImg.at<ushort>(i,j);
+//            if( val > 1000){
+//                DepthImg.at<ushort>(i,j) = 0;
+//            }
+//        }
+//    }
 
     DepthShow = DepthImg.clone();
 }
@@ -133,14 +133,8 @@ int TODDetector::initParam(){
         TCCVSION->init(ColorWidth, ColorHeight);
 
 
-
     LineDeTool->loadData("/home/fshs/hirop_vision/data/TOD/coke","milk","stl");
     TCCVSION->LoadModel("/home/fshs/KongWork/pb/20190814-coke-1.pb");
-//    TCCVSION->LoadModel("/home/fshs/KongWork/pb/faster_rcnn_inception_resnet_v2_atrous_coco-15000-20190726.pb");
-=======
-    //LineDeTool->loadData("/home/fshs/hirop_vision/data/TOD/milk12","milk","ply");
-    //TCCVSION->LoadModel("/home/fshs/KongWork/pb/20190802-mobilenet-100000.pb");
-    //TCCVSION->LoadModel("/home/fshs/KongWork/pb/frozen_inference_graph-20190713-2.pb");
 
     name = "TODDetection";
     outPose = vector<float>(6);
@@ -158,15 +152,12 @@ void TODDetector::ScalarPoint(const Point& p01, const Point& p02, Point& p11, Po
 
     p11.y = static_cast<int>(scalarY * p01.y);
     p12.y = static_cast<int>(scalarY * p02.y);
-//    cout << "p11 point :"<<p11.x <<" "<<p11.y<<endl;
-//    cout << "p12 point :"<<p12.x <<" "<<p12.y<<endl;
 
 }
 int TODDetector::detection(){
 
     //深度学习的 二维图像的识别
     outPose.clear();
-
 
     IDebug("%s, %d, %d", "TF detection ColorImg size ", ColorImg.cols, ColorImg.rows);
     int rtn = TCCVSION->detection(ColorImg, outPose);
@@ -175,13 +166,12 @@ int TODDetector::detection(){
 
     if( rtn  < 0 ){
         outPose.clear();
-
         IErrorPrint("%s","nothing detection" );
         return -1;
     }
     cout << "Find the target...... "<<endl;
 
-//    //点云分割 深度图的分割
+    //点云分割 深度图的分割
     int x1 =outPose[2];int y1 =outPose[3];
     int x2 =outPose[4];int y2 =outPose[5];
 
@@ -210,85 +200,6 @@ int TODDetector::detection(){
     imwrite("/home/fshs/KongWork/data-test/JPEGImages/ColorZero" +toString(index)+ ".png", ColorZero);
     IDebug("%s, %d, %d", "LineDeTool ColorImg size ", ColorZero.cols, ColorZero.rows);
 
-	//pose p1;
-	//p1.position.x = (float)(x1 + x2)/2;
-	//p1.position.y = (float)(y1 + y2)/2;
-	//p1.position.z = (float)DepthZero.at<ushort>(DepthShow.rows/2, DepthShow.cols/2)/1000;
-	//outposedd.push_back(p1);
-//	cv::Mat cameraIntriM = (cv::Mat_<float>(3,3)<<
-//					1006.2,0,614.396, \
-//					0,974.716,408.633,\
-//					0,0,1);
-	cv::Mat cameraIntriM = (cv::Mat_<float>(3,3)<<
-					617.94,0,325.894, \
-					0,614.1937,247.2783);
-	std::cout << cameraIntriM <<std::endl;
-	cv::Mat coffeM = (cv::Mat_<float>(5,1)<<
-					0.1727,-0.4572,0,0,0);
-	//cv::Mat input = (cv::Mat_<float>(4,4)<<
-	//				(float)(x1 + x2)/2,0,0,0,
-	//			   	(float)(y1 + y2)/2,0,0,0,
-	//				1,0,0,0,
-	//			   	0,0,0,0);
-
-	float camera_fx = cameraIntriM.at<float>(0,0);
-	float camera_fy = cameraIntriM.at<float>(1,1);
-	float camera_cx = cameraIntriM.at<float>(0,2);
-	float camera_cy = cameraIntriM.at<float>(1,2);
-	float camera_factor = 1000;
-	std::cout << camera_fx <<" "<<camera_fy<<std::endl;
-
-	std::cout << camera_cx <<" "<<camera_cy<<std::endl;
-	//将控制点在世界坐标系的坐标压入容器
-	vector<Point2f> ImageP;
-	Mat objM;
-	ImageP.clear();
-	int Xdias = 10, ydias = 10;
-	//ImageP.push_back(Point2f(rRoi.x-Xdias ,rRoi.y-ydias));
-	//ImageP.push_back(Point2f(rRoi.x-Xdias, rRoi.y+ydias));
-	//ImageP.push_back(Point2f(rRoi.x+Xdias, rRoi.y+ydias));
-	//ImageP.push_back(Point2f(rRoi.x+Xdias, rRoi.y-ydias));
-
-	ImageP.push_back(Point2f(p21.x+Xdias , p21.y+ydias));
-	ImageP.push_back(Point2f(p21.x+Xdias, p22.y-ydias));
-	ImageP.push_back(Point2f(p22.x-Xdias, p22.y-ydias));
-	ImageP.push_back(Point2f(p22.x-Xdias, p21.y+ydias));
-
-
-	vector<Point3f> objP;
-//	for(int i = 0; i < ImageP.size(); i++){
-//		Point2f p = ImageP[i];
-//		//short distance = DepthShow.at<short>(p.x, p.y);
-		double z = 0.3619;
-//		//double z = double(distance)/1000 ;
-//		std::cout << p.x << " "<<p.y<<" "<<z<<std::endl;
-//		double x = (p.x - camera_cx) * z / camera_fx;
-//		double y = (p.y - camera_cy) * z / camera_fy;
-//		objP.push_back(Point3f(x,y,z));
-//O	}
-	
-	objP.push_back(Point3f(-0.025 ,0.05, 0));
-	objP.push_back(Point3f(-0.025,-0.05,0));
-	objP.push_back(Point3f(0.025,-0.05,0));
-	objP.push_back(Point3f(0.025,0.05,0));
-
-
-	std::cout << "*****************"<<std::endl;
-	std::cout << Mat(objP)<< std::endl;
-
-	std::cout << "*****************"<<std::endl;
-	std::cout << Mat(ImageP)<< std::endl;
-
-	Mat rvec, tvec;
-	solvePnP(Mat(objP), Mat(ImageP), cameraIntriM ,coffeM, rvec, tvec);
-
-	std::cout << "*****************"<<std::endl;
-	std::cout << rvec<< std::endl;
-	std::cout << "*****************"<<std::endl;
-	std::cout << tvec<< std::endl;
-//	Mat rotM, rotT;
-//	Rodrigues(rvec, rotM);  //将旋转向量变换成旋转矩阵
-//	Rodrigues(tvec, rotT);
 
 	////std::cout << externM* cameraIntriM*input<<std::endl;
     //linemod 的三维图像识别
@@ -315,17 +226,14 @@ int TODDetector::detection(){
 
         IDebug("%s ", " find ................");
      }else{
-		outposedd.clear();
-        IDebug("%s ", " non - find ................");
+//		outposedd.clear();
+        IDebug("%s ", " linemod non-find  .............");
 		return -1;
      }
 
-	std::cout << tvec.at<double>(1,0)<<std::endl;
-	//p1.position.x = tvec.at<float>(0); 
-	//p1.position.y = tvec.at<float>(1);
+
 	vector<double> disArray;
-	//circle(ColorZero, Point(rRoi.x,rRoi.y),50,Scalar(255,255,0) );
-	//circle(ColorZero, Point(p22.x,p22.y),50,Scalar(255,255,0) );
+
 	int centerX = rRoi.x + rRoi.width/2;
 	int centerY = rRoi.y + rRoi.height/2;	
 
@@ -334,7 +242,7 @@ int TODDetector::detection(){
 		for(int j = -1; j < 2; j++)
 		{
 			double  d =(double)DepthImg.at<short>(centerY + i, centerX + j )/1000;
-			cout << "d "<<d<<endl;
+//			cout << "d "<<d<<endl;
 			if(d <= 0 ) continue;
 			disArray.push_back(d);
 		}
@@ -345,9 +253,6 @@ int TODDetector::detection(){
 	}
 	cout << "sum "<< SumDistance <<endl;
 	outposedd[0].position.z = SumDistance / disArray.size();
-
-	cout << " pnp: "<< tvec.at<float>(0)  << " "<< tvec.at<float>(1) <<" "<<p1.position.z<<endl; 
-
 
 
     return 0;
