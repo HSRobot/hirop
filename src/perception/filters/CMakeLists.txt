@@ -34,6 +34,7 @@ SET(SOURCES
 SET(SOURCES
         ${SOURCES}
         object_filter.cpp
+        voxel_filter.cpp
 )
 
 

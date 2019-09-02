@@ -31,7 +31,7 @@ add_definitions(-std=c++11)
 ## 核心框架代码
 add_subdirectory(framework)
 ##TOD
-add_subdirectory(TODDetector)
+#add_subdirectory(TODDetector)
 ## 检测器代码
 add_subdirectory(detector)
 ## 训练器代码

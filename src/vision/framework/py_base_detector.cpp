@@ -88,7 +88,7 @@ int PyBaseDetector::detection(){
 void PyBaseDetector::setColorImg(const cv::Mat &inputImg){
 
     if(inputImg.empty() == true)
-       return;
+        return;
 
     PyLockHelper lock;
     int rows =  inputImg.rows;
@@ -121,7 +121,7 @@ void PyBaseDetector::setDepthImg(const cv::Mat &inputImg){
     int channels = inputImg.channels();
 
     if(inputImg.empty() == true)
-       return;
+        return;
 
     IDebug("rows = %d, cols = %d, channels = %d", rows, cols, channels);
 
@@ -157,7 +157,7 @@ int PyBaseDetector::getResult(std::vector<pose> &poses){
     //每个维度的长度  总长度 但是每一列的数据长度为7
     npy_intp *shape = PyArray_SHAPE(ret_array);
     double* pDataPtr = (double*)PyArray_DATA(ret_array);
-//    std::cout << "rows: "<< shape[0] << " cols: "<< shape[1]<<std::endl;
+
     int rows = shape[0];
     //有输出结果
     if( rows >0 ){
