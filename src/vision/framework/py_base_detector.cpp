@@ -217,3 +217,7 @@ int PyBaseDetector::isMultiDetector(){
 int PyBaseDetector::parseConfig(const YAML::Node &node){
     return 0;
 }
+
+int PyBaseDetector::getPreImg(cv::Mat &preImg){
+    return 0;
+}

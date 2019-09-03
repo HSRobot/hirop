@@ -5,6 +5,7 @@
 
 #include "itrainer.h"
 #include "idetector.h"
+#include "iloader.h"
 
 #include <hpluginloader.h>
 
@@ -35,7 +36,7 @@
 
 namespace hirop_vision{
 
-class CppLoader{
+class CppLoader : public ILoader{
 
 public:
     CppLoader();
@@ -67,6 +68,10 @@ public:
     void getTrainerList(std::vector<std::string> &trainerList);
 
 private:
+
+    /**
+     * @brief loader    插件系统的加载器实例
+     */
     HPluginLoader *loader;
 
     /**

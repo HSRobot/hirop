@@ -22,9 +22,8 @@ public:
 
     int parseConfig(const YAML::Node &node);
 
-private:
+    virtual int getPreImg(cv::Mat &preImg);
 };
 
 }
-
 #endif

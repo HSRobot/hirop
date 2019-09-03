@@ -22,6 +22,8 @@
 #define DETECTION_LISTENER_H
 
 #include "vision.h"
+#include "idetector.h"
+
 #include <iostream>
 #include <vector>
 
@@ -36,11 +38,13 @@ class DetectStateListener{
 
 public:
     /**
-     * @brief       当检测器状态发生变化后，调用该函数
-     * @param [detector]    发生状态变化的检测器名称
-     * @return      void
+     * @brief                 当检测器状态发生变化后，调用该函数
+     * @param detector[in]    发生状态变化的检测器名称
+     * @param ret[in]         返回的结果
+     * @param p[in]           识别的位姿结果
+     * @param preMat[in]      预览的图片
      */
-    virtual void onDetectDone(std::string detector, int ret, std::vector<pose> p) = 0;
+    virtual void onDetectDone(std::string detector, int ret, std::vector<pose> p, cv::Mat preImg) = 0;
 };
 
 }
