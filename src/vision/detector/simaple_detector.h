@@ -1,7 +1,7 @@
 #pragma once
 
 #include <hpluginloader.h>
-#include <hirop/vision/c_base_detector.h>
+#include <vision/c_base_detector.h>
 
 using namespace hirop_vision;
 
