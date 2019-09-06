@@ -82,6 +82,13 @@ int PyBaseDetector::detection(){
         PyErr_Print();
         return -1;
     }
+
+    int res = -1;
+    PyArg_Parse(ret, "i", &res);
+
+    if(res)
+	return -1;
+
     return 0;
 }
 

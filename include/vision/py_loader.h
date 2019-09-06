@@ -71,7 +71,7 @@ private:
     int initSysPath();
 
 public:
-    const static std::string PATH;
+    static std::string PATH;
     static PyLoader *instance;
 };
 

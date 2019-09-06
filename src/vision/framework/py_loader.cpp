@@ -10,7 +10,7 @@ using namespace hirop_vision;
 
 PyLoader* PyLoader::instance = NULL;
 
-const std::string PyLoader::PATH = "/home/de/data/caffe_show/python2/";
+std::string PyLoader::PATH = "./";
 
 ITrainer *PyLoader::loadTrainer(std::string trainerName){
     return NULL;
@@ -82,6 +82,13 @@ void PyLoader::getDetectorList(std::vector<std::string> &detectorList){
 }
 
 int PyLoader::initSysPath(){
+
+    const char *envPath;
+    envPath = getenv("VISION_PYTHON_PLUGIN_PATH");
+ 
+    if(envPath != NULL){
+	PATH = envPath; 
+    }
 
     std::string chdir_cmd = std::string("sys.path.append(\"") + PATH + "\")";
     const char *cstr_cmd = chdir_cmd.c_str();
