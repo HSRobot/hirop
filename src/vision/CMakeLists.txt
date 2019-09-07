@@ -1,6 +1,3 @@
-## 使用PYthon3版本
-FIND_PACKAGE(Python 3 COMPONENTS Development)
-
 ## 使用opnecv
 FIND_PACKAGE(OpenCV REQUIRED)
 FIND_PACKAGE(opencv_candidate REQUIRED)
@@ -8,12 +5,24 @@ FIND_PACKAGE(yaml-cpp REQUIRED)
 
 INCLUDE_DIRECTORIES(${OpenCV_INCLUDE_DIRS})
 
+
+OPTION(WITH_PYTHON3 "USE PYTHON3 " OFF)
+MESSAGE("WITH_PYTHON3 " ${WITH_PYTHON3})
+
+# 使用PYthon3版本
+IF(WITH_PYTHON3)
+    SET(PYTHON_PATH /usr/include/python3.5/)
+ELSE()
+    SET(PYTHON_PATH /usr/include/python2.7/)
+ENDIF()
+
+
 IF(${Python_FOUND})
 	INCLUDE_DIRECTORIES(${Python_INCLUDE_DIRS})
 ELSEIF(${PYTHON_INCLUDE_PATH})
 	INCLUDE_DIRECTORIES(${PYTHON_INCLUDE_PATH})
 ELSE()
-	INCLUDE_DIRECTORIES(/usr/include/python3.5/)
+        INCLUDE_DIRECTORIES(${PYTHON_PATH})
 ENDIF()
 
 ## 支持C++11 因为Yaml-cpp使用了c++11
@@ -26,6 +35,6 @@ add_subdirectory(framework)
 ## 检测器代码
 add_subdirectory(detector)
 ## 训练器代码
-add_subdirectory(trainer)
+#add_subdirectory(trainer)
 
 

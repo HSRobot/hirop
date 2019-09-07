@@ -1,0 +1,28 @@
+parameters: 
+  TOD:
+    ColorWidth: 640
+    ColorHeight: 480
+    camera_factor: 1000 #换算（毫米到米）
+    cameraIntriM: [617.94 ,0,325.894, 0,614.1937,247.2783,0,0,0] # 相机内参3x3
+    coffeM: [0.1727,-0.4572,0,0,0]#5x1
+    pbPath: /home/de/testDatamnist/pb/frozen_inference_graph-20190715.pb
+   #z: 0.3619 //识别物体z轴设置
+    
+    #linemod
+  linemod:   
+  #milk 12
+    param_n_points_: 150
+    param_angle_step_: 10
+  #scale 缩放比例
+    param_radius_min_: 0.6
+    param_radius_max_: 1.2
+    param_radius_step_: 0.4
+    param_width_: 640
+    param_height_: 480
+    param_focal_length_x_: 614.0   #525
+    param_focal_length_y_: 614.0
+    param_near_: 0.1 #0.1
+    param_far_: 100
+  # 训练器与识别器的参数应该是一致的 
+    tmpMat_: [617.94, 0, 325.894, 0, 614.1937, 247.2789, 0, 0, 1]
+

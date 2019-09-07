@@ -15,6 +15,15 @@
 
 using namespace std;
 using namespace hirop_vision;
+
+
+#define DEBUG
+#ifdef DEBUG
+#define DBGprint(...) printf(__VA_ARGS__)
+#else
+#define DBGprint(...)
+#endif
+
 /**
  * 
  * 移值tensorflow object detection 模块
@@ -32,11 +41,6 @@ public:
      */
     virtual int detection();
 
-    //    /**
-    //     * @brief   解析识别器私有训练器配置，具体由相关识别器实现
-    //     * @return void
-    //     */
-    //    virtual int parseConfig()  ;
 
     /**
      * @brief   加载相关识别器识别时需要的数据
@@ -55,12 +59,6 @@ public:
     * @return void
     */
     virtual void setDepthImg(const cv::Mat &inputImg);
-
-    //    /**
-    //     * @brief   获取识别过程中的预览图片
-    //     * @return void
-    //     */
-    //    virtual void getImg()  ;
 
     /**
      * @brief  获取图像识别过程中的结果
@@ -86,9 +84,23 @@ public:
      * @return      返回训练器的实现实体类别
      */
     virtual ENTITY_TYPE getEntityType()  ;
+
+    /**
+     * @brief parseConfig
+     * @param node
+     * @return
+     */
+    int parseConfig(const YAML::Node &node);
+
 private:
+    /**
+     * @brief initParam
+     * 参数进行初始化
+     * @return
+     */
     int initParam();
     void ScalarPoint(const Point& p01, const Point& p02, Point& p11, Point& p12);
+    int DepthFitter(Rect rRoi, const Mat& DepthImg, double& MeanDepth);
 private:
     TensorflowCCVisoin *TCCVSION;
     vector<float> outPose;
@@ -99,11 +111,19 @@ private:
     int ColorWidth, ColorHeight;
     cv::Mat DepthImg ,ColorImg, ColorShow, DepthShow;
     string ThisDetectionName;
+    vector<string> TODName;  //文本外置参数
+
+    int camera_factor;
+    cv::Mat cameraIntriM;
+
 private:
     // opencv linemod对象指针
     // cv::linemod::Detector *detector_;
     LinemodDetector *LineDeTool;
-
+    int readYamlData(const YAML::Node& node);
+    YAML::Node node;
+    cv::Mat coffeM;
+    std::string pbPath;
 
 };
 

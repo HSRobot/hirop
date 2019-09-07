@@ -12,10 +12,8 @@ string toString(T& t){
 
 TODDetector::TODDetector():CBaseDetector("TODDetector", false){
     LineDeTool = new LinemodDetector();
-
     TCCVSION = new TensorflowCCVisoin();
     index = 0;
-
 
     initParam();
 }
@@ -27,41 +25,48 @@ TODDetector::~TODDetector()
 }
 
 int TODDetector::loadData(const std::string path, const std::string objectName){
-//    TCCVSION->LoadModel(path);
     cout <<"path： " << path<< endl;
     cout <<"objectName：" <<objectName<<endl;
-	if( TCCVSION == nullptr ){
-		TCCVSION = new TensorflowCCVisoin();
-	}
+    IDebug("ColorWidth: %d ColorHeight: %d ",ColorWidth, ColorHeight);
 
-	if(LineDeTool == nullptr ){
-		LineDeTool = new LinemodDetector();
-	}	
-//LineDeTool->loadDatfaster_rcnn_inception_resnet_v2_atrous_coco-15000-20190726a(path , objectName);
-    return 0;
-}
-void TODDetector::setColorImg(const cv::Mat &inputImg){
-	std::cout << inputImg.channels()<<std::endl;
-    if( inputImg.channels() != 3){
-        std::cout << "************************** "<<std::endl;
-//        assert(inputImg.channels() == 3);
+
+    if( TCCVSION != nullptr)
+        TCCVSION->init(ColorWidth, ColorHeight);
+    else{
+        cerr << "tensorflow init error !"<<endl;
+        return -1;
     }
 
-    std::cout <<"image size   "<<inputImg.cols<<" "<< inputImg.rows<<std::endl;
+    TCCVSION->LoadModel(this->pbPath);
+    LineDeTool->loadData(path, objectName, "stl");
+    return 0;
+}
 
-    //这里需要备注一下 识别的颜色类型为 RGB 通道
+int TODDetector::parseConfig(const YAML::Node &node){
+    int rtn = this->readYamlData(node);
+    rtn += LineDeTool->readYamlData(node);
+    return rtn;
+}
 
+void TODDetector::setColorImg(const cv::Mat &inputImg){
+    if( inputImg.channels() != 3){
+        IErrorPrint("inputImg.channels is no three , it can cause anothor errors %d" ,inputImg.channels());
+    }
+
+    IErrorPrint("input image size  %d  %d  %d", inputImg.cols, inputImg.rows,inputImg.depth());
+    //这里需要备注一下 识别的颜色类型为 RGB 通道 输入的图像预处理
     ColorShow = inputImg.clone();
     if( inputImg.rows != ColorHeight || inputImg.cols != ColorWidth){
-        cv::resize(ColorShow,ColorImg,Size(ColorWidth, ColorHeight));
+        cv::resize(ColorShow, ColorImg,Size(ColorWidth, ColorHeight));
     }else{
 		ColorImg = ColorShow.clone();
 	}
+
     cv::cvtColor(ColorImg, ColorImg, COLOR_BGR2RGB);
 
 }
 void TODDetector::setDepthImg(const cv::Mat &inputImg){
-    cout<< "setDepthImg "<< inputImg.depth()<<endl;
+    IErrorPrint("setDepthImg : %d ", inputImg.depth());
     DepthImg = inputImg;
 
     // 深度滤波
@@ -82,30 +87,21 @@ int TODDetector::getResult(std::vector<pose> &poses){
     pose p1;
     if(outposedd.size() == 0 ){
         p1.objectName = ThisDetectionName;
-        p1.position.x = 0;
-        p1.position.y = 0;
-        p1.position.z = 0;
-        p1.quaternion.x = 0;
-        p1.quaternion.y = 0;
-        p1.quaternion.z = 0;
-        p1.quaternion.w = 0;
+        p1.position.x = 0;   p1.position.y = 0;   p1.position.z = 0;
+        p1.quaternion.x = 0; p1.quaternion.y = 0;
+        p1.quaternion.z = 0; p1.quaternion.w = 0;
         poses.push_back(p1);
         return -1;
-
     }else{
         // detection ok
         poses = outposedd;
         for(int i =0; i < poses.size() ;i++){
             std::cout << " out: "<< poses[i].position.x<<" "  \
-                        << poses[i].position.y<<" "  \
-                        << poses[i].position.z<<" "  \
-                        << poses[i].quaternion.x<<" "  \
-                        <<poses[i].quaternion.y<<"  " \
-                        <<poses[i].quaternion.z<<"  " \
-                        <<poses[i].quaternion.w <<std::endl;
+                        << poses[i].position.y<<" " << poses[i].position.z<<" "  \
+                        << poses[i].quaternion.x<<" " <<poses[i].quaternion.y<<"  " \
+                        <<poses[i].quaternion.z<<"  "  <<poses[i].quaternion.w <<std::endl;
         }
     }
-
 
     return 0;
 }
@@ -125,17 +121,14 @@ ENTITY_TYPE TODDetector::getEntityType(){
     return CPP;
 }
 
+/**
+ * @brief TODDetector::initParam 数据初始化
+ * @return
+ */
 int TODDetector::initParam(){
     ThisDetectionName = "TOD";
-    ColorWidth = 640;
-    ColorHeight = 480;
-	if( TCCVSION != nullptr)
-        TCCVSION->init(ColorWidth, ColorHeight);
 
-
-    LineDeTool->loadData("/home/fshs/hirop_vision/data/TOD/coke","milk","stl");
-    TCCVSION->LoadModel("/home/fshs/KongWork/pb/20190814-coke-1.pb");
-
+    TODName = {"ColorWidth", "ColorHeight","camera_factor" ,"pbModel", "3DModel"};
     name = "TODDetection";
     outPose = vector<float>(6);
     return 0;
@@ -149,9 +142,50 @@ void TODDetector::ScalarPoint(const Point& p01, const Point& p02, Point& p11, Po
     float  scalarY = static_cast<float>(DepthShow.rows/this->ColorHeight);
     p11.x = static_cast<int>(scalarX * p01.x);
     p12.x = static_cast<int>(scalarX * p02.x);
-
     p11.y = static_cast<int>(scalarY * p01.y);
     p12.y = static_cast<int>(scalarY * p02.y);
+
+}
+
+int TODDetector::DepthFitter(Rect rRoi, const Mat& DepthImg, double& MeanDepth)
+{
+    vector<double> disArray;
+    int centerX = rRoi.x + rRoi.width/2;
+    int centerY = rRoi.y + rRoi.height/2;
+    cout << centerX<< " "<<centerY <<endl;
+    for(int i = -1; i < 2 ; i++){
+        for(int j = -1; j < 2; j++)
+        {
+            double  d =(double)DepthImg.at<short>(centerY + i, centerX + j )/1000;
+            cout << "d "<<d<<endl;
+            if(d <= 0 ) continue;
+            disArray.push_back(d);
+        }
+    }
+    double SumDistance = 0;
+    for( int i = 0; i < disArray.size(); i++){
+        SumDistance += disArray[i];
+    }
+    cout << "sum "<< SumDistance <<endl;
+    MeanDepth = SumDistance/disArray.size();
+
+    return 0;
+}
+
+int TODDetector::readYamlData(const YAML::Node &node)
+{
+    try{
+        this->ColorWidth = node["TOD"]["ColorWidth"].as<int>();
+        this->ColorHeight = node["TOD"]["ColorHeight"].as<int>();
+        this->pbPath = node["TOD"]["pbPath"].as<std::string>();
+    }catch(YAML::Exception e)
+    {
+        std::cerr<<"TOD YAML:" << e.msg<<std::endl;
+        return -1;
+    }
+    std::cout <<"pbPath "<<pbPath<<std::endl;
+    return 0;
+
 
 }
 int TODDetector::detection(){
@@ -232,27 +266,10 @@ int TODDetector::detection(){
      }
 
 
-	vector<double> disArray;
 
-	int centerX = rRoi.x + rRoi.width/2;
-	int centerY = rRoi.y + rRoi.height/2;	
-
-	cout << centerX<< " "<<centerY <<endl;
-	for(int i = -1; i < 2 ; i++){
-		for(int j = -1; j < 2; j++)
-		{
-			double  d =(double)DepthImg.at<short>(centerY + i, centerX + j )/1000;
-//			cout << "d "<<d<<endl;
-			if(d <= 0 ) continue;
-			disArray.push_back(d);
-		}
-	}
-	double SumDistance = 0;
-	for( int i = 0; i < disArray.size(); i++){
-		SumDistance += disArray[i];
-	}
-	cout << "sum "<< SumDistance <<endl;
-	outposedd[0].position.z = SumDistance / disArray.size();
+    double MeanDepth;
+    DepthFitter(rRoi, DepthImg, MeanDepth);
+    outposedd[0].position.z = MeanDepth;
 
 
     return 0;
