@@ -82,6 +82,13 @@ int PyBaseDetector::detection(){
         PyErr_Print();
         return -1;
     }
+
+    int res = -1;
+    PyArg_Parse(ret, "i", &res);
+
+    if(res)
+	return -1;
+
     return 0;
 }
 
@@ -215,5 +222,9 @@ int PyBaseDetector::isMultiDetector(){
 }
 
 int PyBaseDetector::parseConfig(const YAML::Node &node){
+    return 0;
+}
+
+int PyBaseDetector::getPreImg(cv::Mat &preImg){
     return 0;
 }

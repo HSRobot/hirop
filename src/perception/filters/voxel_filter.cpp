@@ -31,7 +31,7 @@ int VoxelFilter::process(const tendrils& inputs, const tendrils& outputs,
 
     std::cout << "PointCloud before filtering: " << input->width * input->height << std::endl;
 
-    pcl::VoxelGrid< typename pcl::PointCloud<Point> > sor;
+    pcl::VoxelGrid< Point > sor;
     sor.setInputCloud (input);
     sor.setLeafSize (0.01f, 0.01f, 0.01f);
     sor.filter (*cloudFiltered);
@@ -43,3 +43,5 @@ int VoxelFilter::process(const tendrils& inputs, const tendrils& outputs,
     return ecto::OK;
 }
 
+ECTO_CELL(hirop_perception, ecto::pcl::PclCell<VoxelFilter>,\
+          "VoxelFilter", "The point cloud voxel filter")

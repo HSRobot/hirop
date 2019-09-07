@@ -59,22 +59,23 @@ public:
     virtual int loadData(const std::string path, const std::string objectName) = 0;
 
     /**
-                    * @brief   传递识别需要的彩色图片数据
+     * @brief   传递识别需要的彩色图片数据
      * @return void
      */
     virtual void setColorImg(const cv::Mat &inputImg) = 0;
 
     /**
-                    * @brief   传递识别需要的深度图片数据
-                    * @return void
-                    */
+     * @brief   传递识别需要的深度图片数据
+     * @return void
+     */
     virtual void setDepthImg(const cv::Mat &inputImg) = 0;
 
-    //    /**
-    //     * @brief   获取识别过程中的预览图片
-    //     * @return void
-    //     */
-    //    virtual void getImg() = 0;
+    /**
+     * @brief   获取识别过程中的预览图片
+     * @param perImg[out]   预览图片
+     * @return      0 正常获取到预览图片 -1 反之
+     */
+    virtual int getPreImg(cv::Mat &preImg) = 0;
 
     /**
      * @brief  获取图像识别过程中的结果
@@ -101,14 +102,27 @@ public:
      */
     virtual ENTITY_TYPE getEntityType() = 0;
 
+    /**
+     * @brief havePreImg    返回是否有预览图片
+     * @return
+     */
+    virtual bool havePreImg() {return havePreviewImage;}
+
 protected:
-    // 保存识别器的字符描述
+
+    /**
+     * @brief name      识别器的名称
+     */
     std::string name;
 
-    // 是否会输出相关的预览图片
+    /**
+     * @brief havePreviewImage  该实例是否会生成预览图片
+     */
     bool havePreviewImage;
 
-    // 其算法实现类别 C++ / Python
+    /**
+     * @brief entityType    实例的实现类别 PYTHON 或 C++
+     */
     hirop_vision::ENTITY_TYPE entityType;
 
     /**

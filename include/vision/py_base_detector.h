@@ -88,6 +88,13 @@ public:
      */
     int isMultiDetector();
 
+    /**
+     * @brief getPreImg 获取预览图片
+     * @param preImg    预览图片
+     * @return          0 正常获取预览图片 -1 反之
+     */
+    int getPreImg(cv::Mat &preImg);
+
 private:
 #ifdef WITH_PYTHON3
     int initNump();

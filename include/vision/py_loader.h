@@ -5,6 +5,15 @@
 
 #include "itrainer.h"
 #include "idetector.h"
+#include "iloader.h"
+
+/**
+ * @brief   PY_DETECTOR_REGEX   通过文件名获取识别器名称的正则表达式
+ * (?<=lib) 表示lib参与正则表达式的匹配，但是获取匹配结果时不获取lib
+ * \\w+     表示有1个或1个以上的字符串
+ * Detector  表示识别器名称最后必须由Detector组成
+ */
+#define PY_DETECTOR_REGEX "\\w+(?<=Detector)"
 
 namespace hirop_vision{
 
@@ -14,7 +23,7 @@ namespace hirop_vision{
  * @date        2019-04-22
  */
 
-class PyLoader{
+class PyLoader : public ILoader{
 
 public:
     /**
@@ -22,9 +31,27 @@ public:
      * @param[in] detectorName 识别器名称
      * @return  识别器实例指针
      */
-    IDetector *loadDetector(const std::string &detectorName);
+    IDetector *loadDetector(std::string detectorName);
 
-    //    ITrainer *loadTrainer(const std::string &trainerName);
+    /**
+     * @brief loadTrainer   加载训练器
+     * @param trainerName   训练器的名称
+     * @return              训练器实例的指针
+     */
+    ITrainer *loadTrainer(std::string trainerName);
+
+    /**
+     * @brief getDetectorList   获取系统中可用的识别器列表
+     * @param detectorList[out] 识别器列表
+     */
+    void getDetectorList(std::vector<std::string> &detectorList);
+
+    /**
+     * @brief       获取当前系统中可用的训练器列表
+     * @param[out]  trainerList 系统中可用的训练器列表
+     */
+    void getTrainerList(std::vector<std::string> &trainerList);
+
     /**
      * @brief   获取pyloader的是列
      * @return  返回加载器实例指针
@@ -44,7 +71,7 @@ private:
     int initSysPath();
 
 public:
-    const static std::string PATH;
+    static std::string PATH;
     static PyLoader *instance;
 };
 

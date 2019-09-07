@@ -44,11 +44,11 @@ int Detector::detectionOnce(const cv::Mat &depthImg, const cv::Mat &colorImg){
      * 暂时将线程功能关闭，因为当前Linemod识别器在线程下运行时有BUG
      */
     __detection(false);
-//    boost::function0<int> f =  boost::bind(&Detector::__detection,this, false);
-//    detectionThr = new boost::thread(f);
+    //    boost::function0<int> f =  boost::bind(&Detector::__detection,this, false);
+    //    detectionThr = new boost::thread(f);
 
-//    // 启动线程
-//    detectionThr->timed_join(boost::posix_time::microseconds(1));
+    //    // 启动线程
+    //    detectionThr->timed_join(boost::posix_time::microseconds(1));
 
     return 0;
 
@@ -88,6 +88,7 @@ int Detector::setOnStateChangeCallback(DetectStateListener *listener){
 int Detector::__detection(bool loop){
 
     std::vector<pose> results;
+    cv::Mat preImg;
     int ret;
 
     // 开始识别[阻塞式函数]
@@ -97,6 +98,20 @@ int Detector::__detection(bool loop){
         goto _detectionFaile;
     }
 
+    /**
+     *  获取预览图片
+     */
+    if(detectorPtr->havePreImg()){
+        ret = detectorPtr->getPreImg(preImg);
+        if(ret){
+            std::cerr << "get preview image error" << std::endl;
+            goto _detectionFaile;
+        }
+    }
+
+    /**
+     *  获取识别结果
+     */
     ret = detectorPtr->getResult(results);
     if(ret){
         std::cerr << "get result error" << std::endl;
@@ -107,7 +122,7 @@ int Detector::__detection(bool loop){
       * @todo 传递给监听者正确的识别结束状态码
       */
     if(listener != NULL)
-        listener->onDetectDone(detectorName, ret, results);
+        listener->onDetectDone(detectorName, ret, results, preImg);
 
     delete detectionThr;
     detectionThr = NULL;
@@ -119,9 +134,8 @@ _detectionFaile:
     return -1;
 }
 
-
 int Detector::setDetector(const std::string &name, const std::string &objectName, ENTITY_TYPE type, \
-                           std::string configFile){
+                          std::string configFile){
 
     int ret = 0;
     this->detectorName = name;
@@ -205,9 +219,9 @@ int Detector::setDetector(const std::string &name, const std::string &objectName
     return 0;
 }
 
-
 void Detector::getDetectorList(std::vector<std::string> &detectorList){
     cppLoader->getDetectorList(detectorList);
+    pyLoader->getDetectorList(detectorList);
 }
 
 int Detector::getObjectList(std::string detecorName, std::vector<std::string> &objectList){
@@ -224,4 +238,3 @@ int Detector::getObjectList(std::string detecorName, std::vector<std::string> &o
     return objectList.size();
 
 }
-

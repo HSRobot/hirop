@@ -6,6 +6,7 @@ CBaseDetector::CBaseDetector(std::string name, bool isMultiDetector){
     this->name = name;
     this->entityType = CPP;
     this->_isMultiDetector = isMultiDetector;
+    this->havePreviewImage = false;
 }
 
 int CBaseDetector::getName(std::string &name){
@@ -31,4 +32,8 @@ int CBaseDetector::isMultiDetector(){
 
 int CBaseDetector::parseConfig(const YAML::Node &node){
     return 0;
+}
+
+int CBaseDetector::getPreImg(cv::Mat &preImg){
+    return -1;
 }
