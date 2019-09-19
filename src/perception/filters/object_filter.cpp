@@ -58,7 +58,7 @@ int ObjectFilter::process(const ecto::tendrils &in, const ecto::tendrils &out){
 }
 
 
-void ObjectFilter::objectDetectionCallback(const vision_bridge::ObjectArray::ConstPtr &msg){
+void ObjectFilter::objectDetectionCallback(const hirop_msgs::ObjectArray::ConstPtr &msg){
     geometry_msgs::PoseStamped _objectCamPose = msg->objects[0].pose;
 
     /**

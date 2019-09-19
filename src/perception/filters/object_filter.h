@@ -5,8 +5,8 @@
 #include <ecto/ecto.hpp>
 #include <ecto_pcl/ecto_pcl.hpp>
 
-#include <vision_bridge/detection.h>
-#include <vision_bridge/ObjectArray.h>
+#include <hirop_msgs/detection.h>
+#include <hirop_msgs/ObjectArray.h>
 
 using ecto::tendrils;
 
@@ -81,7 +81,7 @@ private:
      * @brief objectDetectionCallback   当有物体被识别到时的回调函数
      * @param msg                       消息
      */
-    void objectDetectionCallback(const vision_bridge::ObjectArray::ConstPtr& msg);
+    void objectDetectionCallback(const hirop_msgs::ObjectArray::ConstPtr& msg);
 
 private:
 
