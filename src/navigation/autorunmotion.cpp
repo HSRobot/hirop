@@ -36,11 +36,14 @@ int AutoRunMotion::setup(){
     return -1;
 }
 
-Motion::RETURN_TYPE AutoRunMotion::update(){
+MotionResult AutoRunMotion::update(){
 
     _client->sendGoal(_goal);
 
     _client->waitForResult();
+
+    if(_client->getState() != actionlib::SimpleClientGoalState::SUCCEEDED)
+        return ERROR;
 
     return FINISHED;
 }

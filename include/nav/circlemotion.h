@@ -37,7 +37,7 @@ public:
      * @brief update    每个周期调用一次，Motion在里面实现当前周期速度的计算
      * @return          Motion的结果
      */
-    RETURN_TYPE update();
+    MotionResult update();
 
 private:
     /**
