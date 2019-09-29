@@ -38,17 +38,16 @@ public:
     int runMotion(Motion *motion, bool block = true);
 
     /**
-     * @brief setListener   设置监听者
-     * @return
-     */
-    //int setListener();
-
-    /**
      * @brief getOdom       获取最新的里程计信息
      * @return              最新的里程计信息
      */
-    hirop::Odometry getOdom() const {return _odom;}
+    hirop::Odometry getOdom() const { return _odom; }
 
+    /**
+     * @brief getMotionResult   获取上一个motion的运行结果
+     * @return                  motion的运行结果
+     */
+    MotionResult getMotionResult() { return _result; }
 
 private:
     /**
@@ -110,6 +109,11 @@ private:
      * @brief motion    保存当前正在运行的Motion
      */
     Motion *_motion;
+
+    /**
+     * @brief _result    保存最后一个motion的运行结果
+     */
+    MotionResult _result;
 
 };
 

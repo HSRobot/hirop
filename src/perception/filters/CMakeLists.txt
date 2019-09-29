@@ -38,8 +38,8 @@ SET(SOURCES
 )
 
 
-find_package(vision_bridge REQUIRED)
-INCLUDE_DIRECTORIES(${vision_bridge_INCLUDE_DIRS})
+find_package(hirop_msgs REQUIRED)
+INCLUDE_DIRECTORIES(${hirop_msgs_INCLUDE_DIRS})
 
 ectomodule(hirop_perception DESTINATION ${CMAKE_LIBRARY_OUTPUT_DIRECTORY} INSTALL
     ${SOURCES}

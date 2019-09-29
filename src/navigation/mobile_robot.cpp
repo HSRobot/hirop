@@ -2,7 +2,7 @@
 
 #include <geometry_msgs/Twist.h>
 
-#include <nav/mobile_robot.h>
+#include "nav/mobile_robot.h"
 
 using namespace hirop::navigation;
 
@@ -26,6 +26,7 @@ MobileRobot::MobileRobot(){
 
     _motionThread = NULL;
 
+    _result = CONTINUE;
 }
 
 int MobileRobot::stopMotion(){
@@ -38,6 +39,9 @@ int MobileRobot::stopMotion(){
 
 }
 
+/**
+ * @todo 为对线程进行支持
+ */
 int MobileRobot::runMotion(Motion *motion, bool block){
 
     if(_motionThread != NULL){
@@ -59,6 +63,7 @@ int MobileRobot::runMotion(Motion *motion, bool block){
         _motionThread->timed_join(boost::posix_time::microseconds(1));
     }
 
+    return 0;
 }
 
 void MobileRobot::__runMotion(Motion *motion){
@@ -81,7 +86,10 @@ void MobileRobot::__runMotion(Motion *motion){
     /**
      *  周期性调用motion的update函数，直到update不再返回continue表明motion完成或者出现了错误。
      */
-    while(motion->update() == Motion::CONTINUE){
+
+    _result = motion->update();
+
+    while(_result == CONTINUE){
 
         /**
          * 将motion生成的速度发布给底盘
@@ -92,10 +100,10 @@ void MobileRobot::__runMotion(Motion *motion){
             break;
 
         boost::this_thread::sleep(boost::posix_time::milliseconds(duration));
+        _result = motion->update();
     }
 
     std::cout << "Motion finished" << std::endl;
-
 }
 
 void MobileRobot::odomCallBack(const nav_msgs::OdometryConstPtr msgs){

@@ -12,11 +12,11 @@ namespace hirop{
 
 namespace navigation{
 
+enum MotionResult {FINISHED, ERROR, CONTINUE};
+
 class Motion{
 
 public:
-
-    enum RETURN_TYPE {FINISHED, ERROR, CONTINUE};
 
     /**
      * @brief Motion    构造函数
@@ -38,7 +38,7 @@ public:
      * @brief update    每个周期会调用该函数来更新要发送给底盘的最终速度
      * @return
      */
-    virtual RETURN_TYPE update() = 0;
+    virtual MotionResult update() = 0;
 
     /**
      * @brief stop      停止当前的motion

@@ -26,7 +26,7 @@ public:
 
     int stop();
 
-    RETURN_TYPE update();
+    MotionResult update();
 
 private:
     MoveBaseClient *_client;

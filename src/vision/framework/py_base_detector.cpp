@@ -87,7 +87,7 @@ int PyBaseDetector::detection(){
     PyArg_Parse(ret, "i", &res);
 
     if(res)
-	return -1;
+        return -1;
 
     return 0;
 }

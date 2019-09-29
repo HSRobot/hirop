@@ -43,7 +43,7 @@ public:
      * @brief update    周期更新函数
      * @return          更新结果
      */
-    RETURN_TYPE update();
+    MotionResult update();
 
 private:
     /**

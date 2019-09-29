@@ -26,22 +26,18 @@ int LinearMotion::stop(){
     return 0;
 }
 
-Motion::RETURN_TYPE LinearMotion::update(){
+MotionResult LinearMotion::update(){
 
     if(test > 50){
-
         _cmdvel.linear.x = 0;
         return FINISHED;
-
     }
 
     test ++;
-
     _cmdvel.linear.x = 0.5;
 
     return CONTINUE;
 }
-
 
 LinearMotion::~LinearMotion(){
 

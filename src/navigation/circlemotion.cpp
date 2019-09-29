@@ -28,7 +28,7 @@ int CircleMotion::stop(){
     return 0;
 }
 
-Motion::RETURN_TYPE CircleMotion::update(){
+MotionResult CircleMotion::update(){
 
     _cmdvel.angular.z = _angleVel;
     _cmdvel.linear.x = _linearVel;
