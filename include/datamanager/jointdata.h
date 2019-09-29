@@ -17,7 +17,7 @@ public:
     /**
      * @brief joints    关节数据
      */
-    std::vector<float> joints;
+    std::vector<double> joints;
 
 private:
     /**
