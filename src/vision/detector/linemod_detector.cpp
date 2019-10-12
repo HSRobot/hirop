@@ -44,7 +44,7 @@ void LinemodDetector::initParam(){
     verbose_ = true;
 
 
-    static const int T_LVLS[] = {4, 8};
+    static const int T_LVLS[] = {4, 15};
     std::vector< cv::Ptr<cv::linemod::Modality> > modalities;
     modalities.push_back(new cv::linemod::ColorGradient());
     modalities.push_back(new cv::linemod::DepthNormal());
@@ -158,6 +158,8 @@ void LinemodDetector::loadDetctor(const std::string file_name, cv::linemod::Dete
 }
 
 int LinemodDetector::detection(){
+
+    std::cout<< " Linemod detectioning "<<std::endl;
 
     objs_.clear();
     poses.clear();
@@ -368,6 +370,8 @@ int LinemodDetector::detection(){
         std::cout << "matches  " << objs_.size() << " / " << count_pass << " / " << matches.size() << std::endl;
         return 0;
     }
+
+    std::cout<< " Linemod detectioning out"<<std::endl;
 
     IDebug("%s", "nothing detection");
     return -1;
