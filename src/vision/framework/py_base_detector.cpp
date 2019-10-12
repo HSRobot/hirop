@@ -15,7 +15,7 @@ using namespace hirop_vision;
 PyBaseDetector::PyBaseDetector(PyObject *pClass, std::string detectorName){
 
     this->pClass = pClass;
-    this->name = detectorName;
+    this->name = detectorName + "Detector";
 
     if(!pClass){
         IErrorPrint("%s", "Python instance load failed: the class was null");
@@ -158,18 +158,24 @@ int PyBaseDetector::getResult(std::vector<pose> &poses){
     if(!ret)
         PyErr_Print();
 
-    //数组多少个维度？
+
     PyArrayObject *ret_array;
     PyArray_OutputConverter(ret, &ret_array);
-    //每个维度的长度  总长度 但是每一列的数据长度为7
+
+    /**
+     * 获取数据维度，每组数据有7维(x, y, z, qx, qy, qz, qw)
+     */
     npy_intp *shape = PyArray_SHAPE(ret_array);
     double* pDataPtr = (double*)PyArray_DATA(ret_array);
 
     int rows = shape[0];
-    //有输出结果
-    if( rows >0 ){
+
+    /**
+     * 如果包含数据则进行处理
+     */
+    if( rows > 0 ){
         poses.reserve(rows);
-        for (int i = 0; i < shape[0]; ++i) {
+        for(int i = 0; i < shape[0]; ++i){
             int row = i * shape[1];
             pose p;
             p.position.x = static_cast<double>(pDataPtr[row +0]);
@@ -179,9 +185,7 @@ int PyBaseDetector::getResult(std::vector<pose> &poses){
             p.quaternion.y = static_cast<double>(pDataPtr[row + 4]);
             p.quaternion.z = static_cast<double>(pDataPtr[row + 5]);
             p.quaternion.w = static_cast<double>(pDataPtr[row + 6]);
-
             poses.push_back(p);
-
         }
     }else{
         pose p;
@@ -191,7 +195,7 @@ int PyBaseDetector::getResult(std::vector<pose> &poses){
         p.quaternion.x = 0;
         p.quaternion.y = 0;
         p.quaternion.z = 0;
-        p.quaternion.w = 0;
+        p.quaternion.w = 1;
         poses.push_back(p);
     }
 
@@ -211,12 +215,6 @@ ENTITY_TYPE PyBaseDetector::getEntityType(){
 }
 
 int PyBaseDetector::isMultiDetector(){
-    //    PyLockHelper lock;
-
-    //    PyObject *ret = PyObject_CallMethod(pClassInstance, "isMultiDetector", "OO", pClassInstance, matObj);
-
-    //    if(!ret)
-    //        PyErr_Print();
 
     return 0;
 }

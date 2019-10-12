@@ -9,11 +9,10 @@
 
 /**
  * @brief   PY_DETECTOR_REGEX   通过文件名获取识别器名称的正则表达式
- * (?<=lib) 表示lib参与正则表达式的匹配，但是获取匹配结果时不获取lib
  * \\w+     表示有1个或1个以上的字符串
  * Detector  表示识别器名称最后必须由Detector组成
  */
-#define PY_DETECTOR_REGEX "\\w+(?<=Detector)"
+#define PY_DETECTOR_REGEX "\\w+Detector(?=\\.py\\b)"
 
 namespace hirop_vision{
 

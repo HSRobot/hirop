@@ -40,7 +40,7 @@ IDetector* PyLoader::loadDetector(std::string detectorName){
 
     PyLockHelper lock;
 
-    PyObject* pModule = PyImport_ImportModule(detectorName.c_str());
+    PyObject* pModule = PyImport_ImportModule((detectorName + "Detector").c_str());
 
     if( !pModule ){
         IErrorPrint("%s", "load python module failed");
@@ -55,14 +55,14 @@ IDetector* PyLoader::loadDetector(std::string detectorName){
         return NULL;
     }
 
-    PyObject* pDetectorClass = PyDict_GetItemString(pDict, detectorName.c_str());
+    PyObject* pDetectorClass = PyDict_GetItemString(pDict, (detectorName + "Detector").c_str());
     if( !pDict ){
         IErrorPrint("%s", "load python module class failed");
         PyErr_Print();
         return NULL;
     }
 
-    PyBaseDetector *detector = new PyBaseDetector(pDetectorClass, detectorName);
+    PyBaseDetector *detector = new PyBaseDetector(pDetectorClass, (detectorName + "Detector"));
 
     //@todo free module and pDict
 
@@ -87,7 +87,7 @@ int PyLoader::initSysPath(){
     envPath = getenv("VISION_PYTHON_PLUGIN_PATH");
  
     if(envPath != NULL){
-	PATH = envPath; 
+        PATH = envPath;
     }
 
     std::string chdir_cmd = std::string("sys.path.append(\"") + PATH + "\")";
