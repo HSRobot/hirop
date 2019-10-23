@@ -45,3 +45,8 @@ parameters:
       Roll: []
       Pitch: []
       Yaw: []
+    
+    gripperConfig:
+      joint_name: right_finger_2_joint
+      open_position: 0.0
+      close_position: -0.3491

@@ -70,11 +70,18 @@ class ClassicActuator:public CBasePickPlace{
         double back_vect_z;
     }PickConfig;
 
+    typedef struct GripperConfig{
+        std::string joint_name;
+        double open_position;
+        double close_position;
+    }GripperConfig;
+
     typedef struct Parameters{
         Geometry geometry;
         MoveitConfig moveitConfig;
         PickPlaceConfig pickConfig;
         PickPlaceConfig placeConfig;
+        GripperConfig gripperConfig;
     }Parameters;
 
 public:

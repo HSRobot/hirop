@@ -69,6 +69,12 @@ int ClassicActuator::parseConfig(YAML::Node& yamlNode)
         m_parm.placeConfig.back_vect_y =  node["placeConfig"]["back_vect_y"].as<double>();
         m_parm.placeConfig.back_vect_z =  node["placeConfig"]["back_vect_z"].as<double>();
     }
+    if(node["gripperConfig"]){
+        m_parm.gripperConfig.joint_name = node["gripperConfig"]["joint_name"].as<std::string>();
+        m_parm.gripperConfig.open_position = node["gripperConfig"]["open_position"].as<double>();
+        m_parm.gripperConfig.close_position = node["gripperConfig"]["close_position"].as<double>();
+    }
+
 
     addBaseTable();
 
@@ -107,7 +113,11 @@ int ClassicActuator::parseConfig(YAML::Node& yamlNode)
         "m_parm.placeConfig.pre_vect_z:"<<m_parm.placeConfig.pre_vect_z<<std::endl<<
         "m_parm.placeConfig.back_vect_x:"<<m_parm.placeConfig.back_vect_x<<std::endl<<
         "m_parm.placeConfig.back_vect_y:"<<m_parm.placeConfig.back_vect_y<<std::endl<<
-        "m_parm.placeConfig.back_vect_z:"<<m_parm.placeConfig.back_vect_z<<std::endl;
+        "m_parm.placeConfig.back_vect_z:"<<m_parm.placeConfig.back_vect_z<<std::endl<<
+
+        "m_parm.gripperConfig.joint_name:"<<m_parm.gripperConfig.joint_name<<std::endl<<
+        "m_parm.gripperConfig.open_position:"<<m_parm.gripperConfig.open_position<<std::endl<<
+        "m_parm.gripperConfig.close_position:"<<m_parm.gripperConfig.close_position<<std::endl;
 
 //        "m_parm.pickConfig.m_Roll:"<<m_parm.pickConfig.m_Roll<<
 //        "m_parm.pickConfig.m_Pitch:"<<m_parm.pickConfig.m_Pitch<<
@@ -492,7 +502,7 @@ trajectory_msgs::JointTrajectory ClassicActuator::makeGripperPosture(double jion
 {
     trajectory_msgs::JointTrajectory tj;
     trajectory_msgs::JointTrajectoryPoint tjp;
-    tj.joint_names.push_back("right_finger_2_joint");
+    tj.joint_names.push_back(m_parm.gripperConfig.joint_name);
     tjp.positions.push_back(jiont_position);
     tjp.effort.push_back(1.0);
     tjp.time_from_start = ros::Duration(1.0);
@@ -551,16 +561,16 @@ int ClassicActuator::makeGrasp()
     grasp_pose.grasp_pose.pose.position.y = m_pickPose.pose.position.y;
     grasp_pose.grasp_pose.pose.position.z = m_pickPose.pose.position.z;
 
+    grasp_pose.allowed_touch_objects.push_back("object");
+    grasp_pose.max_contact_force = 0;
+    grasp_pose.pre_grasp_posture = makeGripperPosture(m_parm.gripperConfig.open_position);
+    grasp_pose.grasp_posture = makeGripperPosture(m_parm.gripperConfig.close_position);
+
     std::stringstream ss;
     //if(quats.size() > 0){
     if(false){
         for(int i = 0; i<quats.size();i++){
             ss.clear();
-
-            grasp_pose.allowed_touch_objects.push_back("object");
-            grasp_pose.max_contact_force = 0;
-            grasp_pose.pre_grasp_posture = makeGripperPosture(0.0);
-            grasp_pose.grasp_posture = makeGripperPosture(-0.3491);
             grasp_pose.grasp_pose.pose.orientation.w = quats[i].w;
             grasp_pose.grasp_pose.pose.orientation.x = quats[i].x;
             grasp_pose.grasp_pose.pose.orientation.y = quats[i].y;
@@ -572,10 +582,6 @@ int ClassicActuator::makeGrasp()
         }
     }
     else{
-        grasp_pose.allowed_touch_objects.push_back("object");
-        grasp_pose.max_contact_force = 0;
-        grasp_pose.pre_grasp_posture = makeGripperPosture(0.0);
-        grasp_pose.grasp_posture = makeGripperPosture(-0.3491);
         grasp_pose.grasp_pose.pose.orientation.w = m_pickPose.pose.orientation.w;
         grasp_pose.grasp_pose.pose.orientation.x = m_pickPose.pose.orientation.x;
         grasp_pose.grasp_pose.pose.orientation.y = m_pickPose.pose.orientation.y;
@@ -667,16 +673,15 @@ int ClassicActuator::makePlace()
     placeLocPos.place_pose.pose.position.x = m_placePose.pose.position.x;
     placeLocPos.place_pose.pose.position.y = m_placePose.pose.position.y;
     placeLocPos.place_pose.pose.position.z = m_placePose.pose.position.z;
+    placeLocPos.allowed_touch_objects.push_back("object");
+    //placeLocPos.max_contact_force = 0;
+    placeLocPos.post_place_posture = makeGripperPosture(m_parm.gripperConfig.close_position);
+    placeLocPos.post_place_posture = makeGripperPosture(m_parm.gripperConfig.open_position);
 
     std::stringstream ss;
     if(quats.size() > 0){
         for(int i = 0; i<quats.size();i++){
             ss.clear();
-
-            placeLocPos.allowed_touch_objects.push_back("object");
-            //placeLocPos.max_contact_force = 0;
-            placeLocPos.post_place_posture = makeGripperPosture(-0.3491);
-            placeLocPos.post_place_posture = makeGripperPosture(0);
             placeLocPos.place_pose.pose.orientation.w = m_placePose.pose.orientation.w;
             placeLocPos.place_pose.pose.orientation.x = m_placePose.pose.orientation.x;
             placeLocPos.place_pose.pose.orientation.y = m_placePose.pose.orientation.y;
@@ -688,10 +693,6 @@ int ClassicActuator::makePlace()
         }
     }
     else{
-        placeLocPos.allowed_touch_objects.push_back("object");
-        //placeLocPos.max_contact_force = 0;
-        placeLocPos.post_place_posture = makeGripperPosture(-0.3491);
-        placeLocPos.post_place_posture = makeGripperPosture(0);
         placeLocPos.place_pose.pose.orientation.w = m_placePose.pose.orientation.w;
         placeLocPos.place_pose.pose.orientation.x = m_placePose.pose.orientation.x;
         placeLocPos.place_pose.pose.orientation.y = m_placePose.pose.orientation.y;
