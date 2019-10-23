@@ -1,6 +1,7 @@
-add_subdirectory(perception)
+#add_subdirectory(perception)
 add_subdirectory(vision)
-add_subdirectory(navigation)
-add_subdirectory(asr)
-add_subdirectory(data_manager)
+#add_subdirectory(navigation)
+#add_subdirectory(asr)
+#add_subdirectory(data_manager)
+add_subdirectory(pickplace)
 

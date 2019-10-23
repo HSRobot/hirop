@@ -1,0 +1,47 @@
+parameters: 
+    geometry: 
+      type: BOX
+      L: 0.060
+      W: 0.033
+      H: 0.105
+      mesh: NULL
+      talbe_link: base_link
+      table_pose_x: 0
+      table_pose_y: 0
+      table_pose_z: -0.25
+    moveitConfig: 
+      plannerId: NULL
+      velocity: 0.3
+      accelerated: 0.05
+      
+    pickConfig: 
+      direct_pick: false
+      pre_dist_min: 0.01
+      pre_dist_max: 0.1
+      pre_vect_x: 0
+      pre_vect_y: 0
+      pre_vect_z: 0
+      back_dist_min: 0.01
+      back_dist_max: 0.1
+      back_vect_x: 0
+      back_vect_y: 0
+      back_vect_z: 0
+      Roll: []
+      Pitch: []
+      Yaw: []
+
+    placeConfig: 
+      direct_place: true
+      pre_dist_min: 0.01
+      pre_dist_max: 0.1
+      pre_vect_x: 0
+      pre_vect_y: 0
+      pre_vect_z: 0
+      back_dist_min: 0.01
+      back_dist_max: 0.1
+      back_vect_x: 0
+      back_vect_y: 0
+      back_vect_z: 1.7
+      Roll: []
+      Pitch: []
+      Yaw: []
