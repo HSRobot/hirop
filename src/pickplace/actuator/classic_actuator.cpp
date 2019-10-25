@@ -78,7 +78,7 @@ int ClassicActuator::parseConfig(YAML::Node& yamlNode)
 
     addBaseTable();
 
-#ifdef COUT
+#ifdef _COUT_
     std::cout<<"m_parm.geometry.type:"<<m_parm.geometry.type<<std::endl<<
         "m_parm.geometry.length:"<<m_parm.geometry.length<<std::endl<<
         "m_parm.geometry.width:"<<m_parm.geometry.width<<std::endl<<
@@ -177,7 +177,7 @@ int ClassicActuator::setPickPose(PoseStamped pickPos)
     m_pickPose.pose.orientation.y = pickPos.pose.orientation.y;
     m_pickPose.pose.orientation.z = pickPos.pose.orientation.z;
 
-#ifdef COUT
+#ifdef _COUT_
     std::cout<<"_pickposes.px ="<<m_pickPose.pose.position.x<<std::endl
              <<",_pickposes.py ="<<m_pickPose.pose.position.y<<std::endl
              <<",_pickposes.pz ="<<m_pickPose.pose.position.z<<std::endl;
@@ -198,7 +198,7 @@ int ClassicActuator::setPlacePose(PoseStamped placePos)
     m_placePose.pose.orientation.y = placePos.pose.orientation.y;
     m_placePose.pose.orientation.z = placePos.pose.orientation.z;
 
-#ifdef COUT
+#ifdef _COUT_
     std::cout<<"_placeposes.px ="<<m_placePose.pose.position.x<<std::endl
              <<"_placeposes.py ="<<m_placePose.pose.position.y<<std::endl
              <<"_placeposes.pz ="<<m_placePose.pose.position.z<<std::endl;
@@ -219,7 +219,7 @@ int ClassicActuator::showObject(PoseStamped object_pose)
     _boxPose.pose.orientation.y = object_pose.pose.orientation.y;
     _boxPose.pose.orientation.z = object_pose.pose.orientation.z;
 
-#ifdef COUT
+#ifdef _COUT_
     std::cout<<"box_pose.x = " <<_boxPose.pose.position.x<<std::endl
              <<"box_pose.y = " <<_boxPose.pose.position.y<<std::endl
              <<"box_pose.z = " <<_boxPose.pose.position.z<<std::endl
@@ -449,7 +449,7 @@ int ClassicActuator::getDiraction(geometry_msgs::PoseStamped pose, std::vector<d
 
     quaternionToEuler(quat, pick_euler);
 
-    if((fabs(pick_euler.pitch - 1.57) <= esp) && pick_euler.yaw == 0){
+    if((fabs(pick_euler.pitch - 1.5708) <= esp) && pick_euler.yaw == 0){
         vect.vect_x = 0;
         vect.vect_y = 0;
         vect.vect_z = -(sin(pick_euler.pitch));
@@ -462,10 +462,14 @@ int ClassicActuator::getDiraction(geometry_msgs::PoseStamped pose, std::vector<d
 
     makeMoreQuat(pick_euler, Roll, Pitch, Yaw, quats);
 
-#ifdef COUT
+#ifdef _COUT_
     std::cout<<"pick_euler.roll =" << pick_euler.roll <<std::endl;
     std::cout<<"pick_euler.pitch =" <<pick_euler.pitch <<std::endl;
     std::cout<<"pick_euler.yaw =" <<pick_euler.yaw <<std::endl;
+    std::cout<<"quat.w =" <<pose.pose.orientation.w <<std::endl;
+    std::cout<<"quat.x =" <<pose.pose.orientation.x <<std::endl;
+    std::cout<<"quat.y =" <<pose.pose.orientation.y <<std::endl;
+    std::cout<<"quat.z =" <<pose.pose.orientation.z <<std::endl;
     std::cout<<"vect.vect_x =" <<vect.vect_x <<std::endl;
     std::cout<<"vect.vect_y =" <<vect.vect_y <<std::endl;
     std::cout<<"vect.vect_z =" <<vect.vect_z <<std::endl;
@@ -622,6 +626,8 @@ int ClassicActuator::pick()
     }
 
     makeGrasp();
+
+    allowed.setEntry("grisper_boby_link", "obkect", true);
 
     IDebug("_graspPoses.size()=%d\n", _graspPoses.size());
     

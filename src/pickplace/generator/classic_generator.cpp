@@ -46,7 +46,7 @@ int ClassicGenerator::parseConfig(YAML::Node& yamlNode)
         m_parm.p_offset_z =   node["placeOffset"]["z"].as<double>();
     }
 
-#ifdef COUT
+#ifdef _COUT_
     std::cout<<
         "m_parm.sorting:"<<m_parm.sorting<<std::endl<<
         "m_parm.follow_R:"<<m_parm.follow_R<<std::endl<<
@@ -87,7 +87,11 @@ int ClassicGenerator::genPickPose()
 
     quaternion_to_euler(m_pickpose.pose.orientation, origin_euler);
 
-#ifdef COUT
+#ifdef _COUT_
+    std::cout<<"orientation.w:"<<m_pickpose.pose.orientation.w<<std::endl
+             <<"orientation.x:"<<m_pickpose.pose.orientation.x<<std::endl
+             <<"orientation.y:"<<m_pickpose.pose.orientation.y<<std::endl
+             <<"orientation.x:"<<m_pickpose.pose.orientation.z<<std::endl;
     std::cout<<"con_euler_r:"<<origin_euler.roll<<std::endl
              <<"con_euler_y:"<<origin_euler.yaw<<std::endl
              <<"con_euler_p:"<<origin_euler.pitch<<std::endl;
@@ -119,7 +123,17 @@ int ClassicGenerator::genPickPose()
     m_pickpose.pose.position.z += m_parm.offset_z;
     m_pickpose.pose.orientation = quat;
 
-#ifdef COUT
+#ifdef _COUT_
+    std::cout<<"orientation.w:"<<m_pickpose.pose.orientation.w<<std::endl
+             <<"orientation.x:"<<m_pickpose.pose.orientation.x<<std::endl
+             <<"orientation.y:"<<m_pickpose.pose.orientation.y<<std::endl
+             <<"orientation.x:"<<m_pickpose.pose.orientation.z<<std::endl;
+    std::cout<<"origin_euler_r:"<<origin_euler.roll<<std::endl
+             <<"origin_euler_p:"<<origin_euler.yaw<<std::endl
+             <<"origin_euler_y:"<<origin_euler.pitch<<std::endl;
+#endif
+
+#ifdef _COUT_
     std::cout<<"frame_id:"<<m_pickpose.frame_id<<std::endl
              <<"m_pickpose.pose.px:"<<m_pickpose.pose.position.x<<std::endl
              <<"m_pickpose.pose.py:"<<m_pickpose.pose.position.y<<std::endl
@@ -149,7 +163,7 @@ int ClassicGenerator::genPlacePose()
     m_placepose.pose.position.z += m_parm.p_offset_z;
     m_placepose.pose.orientation = place_quat;
 
-#ifdef COUT
+#ifdef _COUT_
     std::cout<<"frame_id:"<<m_placepose.frame_id<<std::endl
               <<"m_placepose.pose.px:"<<m_placepose.pose.position.x<<std::endl
               <<"m_placepose.pose.py:"<<m_placepose.pose.position.y<<std::endl

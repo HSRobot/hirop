@@ -19,6 +19,9 @@ ELSE()
         INCLUDE_DIRECTORIES(${PYTHON_PATH})
 ENDIF()
 
+#debug print
+add_definitions(-D_PRINT_)
+
 ## 支持C++11 因为Yaml-cpp使用了c++11
 add_definitions(-std=c++11)
 

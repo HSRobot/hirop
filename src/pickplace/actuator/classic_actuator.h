@@ -16,6 +16,7 @@
 #include <geometric_shapes/shape_messages.h>
 #include <geometric_shapes/shape_operations.h>
 #include <geometric_shapes/mesh_operations.h>
+#include <moveit/collision_detection/collision_matrix.h>
 
 #include "msgs/posestamped.h"
 
@@ -331,9 +332,10 @@ private:
     std::vector<std::string> _objectIds;
     geometry_msgs::PoseStamped _boxPose;
     geometry_msgs::PoseStamped _transitionPose;
+    collision_detection::AllowedCollisionMatrix allowed;
     const std::string _enfLink;
     bool _pickStopFlag;
-    const double esp = 1e-6;
+    const double esp = 1e-3;
 };
 H_DECLARE_PLUGIN(hirop_pickplace::IPickPlace)
 #endif // PICK_EXCUTE_H

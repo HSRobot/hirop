@@ -8,7 +8,9 @@
 
 #include "utils/idebug.h"
 
-#define COUT
+#ifdef _PRINT_
+#define _COUT_
+#endif
 
 namespace hirop_pickplace {
 

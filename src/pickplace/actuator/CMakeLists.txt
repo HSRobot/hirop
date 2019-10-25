@@ -22,6 +22,7 @@ TARGET_LINK_LIBRARIES(ClassicActuator
     moveit_planning_interface
     moveit_planning_scene_interface
     moveit_move_group_interface
+    moveit_collision_detection
     HPlugin
     yaml-cpp)
 

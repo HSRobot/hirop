@@ -6,12 +6,12 @@ parameters:
       Y: true
     grabPosture: 
       DIR_R: 0
-      DIR_P: 0
+      DIR_P: 1.57
       DIR_Y: 0
     grabOffset: 
-      x: 0
-      y: 0
-      z: 0
+      x: 0.0
+      y: 0.0
+      z: 0.0
     placePosture: 
       DIR_R: 0
       DIR_P: 0
