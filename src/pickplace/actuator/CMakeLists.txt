@@ -1,8 +1,6 @@
 ## 经典生成器
 FIND_PACKAGE(tf REQUIRED)
 
-FIND_PACKAGE(hsr_gripper_driver REQUIRED)
-
 FIND_PACKAGE(REQUIRED COMPONENTS
   moveit_core
   moveit_ros_planning_interface
@@ -13,7 +11,7 @@ SET(ROS_LIB_PATH /opt/ros/kinetic/lib)
 
 LINK_DIRECTORIES(${ROS_LIB_PATH})
 
-INCLUDE_DIRECTORIES(${tf_INCLUDE_DIRS} ${hsr_gripper_driver_INCLUDE_DIRS})
+INCLUDE_DIRECTORIES(${tf_INCLUDE_DIRS})
 
 ADD_LIBRARY(ClassicActuator classic_actuator.cpp)
 
@@ -23,6 +21,7 @@ TARGET_LINK_LIBRARIES(ClassicActuator
     moveit_planning_scene_interface
     moveit_move_group_interface
     moveit_collision_detection
+    moveit_kinematic_constraints
     HPlugin
     yaml-cpp)
 

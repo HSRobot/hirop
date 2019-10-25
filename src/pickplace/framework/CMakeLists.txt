@@ -8,6 +8,8 @@ TARGET_LINK_LIBRARIES(hirop_pickplace ${HPlugin_LIBRARIES} ${YAML_CPP_LIBRARIES}
 
 CONFIGURE_FILE(hirop_pickplace.cmake.in ${PROJECT_BINARY_DIR}/hirop_pickplaceConfig.cmake @ONLY)
 
+SET(${PICKPLACE_PLUGIN_PATH} /usr/local/lib/)
+
 ## 安装目标文件
 INSTALL(TARGETS hirop_pickplace
         EXPORT hirop_pickplace

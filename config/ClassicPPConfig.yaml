@@ -47,6 +47,14 @@ parameters:
       Yaw: []
     
     gripperConfig:
-      joint_name: pickup_gripper_joint
+      joint_name: right_finger_1_joint
       open_position: 0.0
       close_position: -0.3491
+      allowed_coliision: right_finger_1_joint
+
+    jointConstraints:
+      joint_name: [joint_3,joint_5,joint_6]
+      position: [4.6,0,0]
+      above: [0,1.68,0.1]
+      below: [2,0.8,0.1]
+      weight: [1,1,1]

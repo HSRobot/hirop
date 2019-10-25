@@ -6,7 +6,7 @@ parameters:
       Y: true
     grabPosture: 
       DIR_R: 0
-      DIR_P: 1.57
+      DIR_P: 0
       DIR_Y: 0
     grabOffset: 
       x: 0.0

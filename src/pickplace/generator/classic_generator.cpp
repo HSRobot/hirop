@@ -217,7 +217,7 @@ int ClassicGenerator::euler_to_quaternion(euler euler, Quaternion& quat)
 
 int ClassicGenerator::correct_euler(euler origin,euler& out_euler)
 {
-#ifdef COUT
+#ifdef _COUT_
     std::cout<<"origin.r =" <<origin.roll <<std::endl;
     std::cout<<"origin.p =" <<origin.pitch <<std::endl;
     std::cout<<"origin.y =" <<origin.yaw <<std::endl;
@@ -241,7 +241,7 @@ int ClassicGenerator::correct_euler(euler origin,euler& out_euler)
     out_euler.roll = origin.roll;
     out_euler.yaw = origin.yaw;
 
-#ifdef COUT
+#ifdef _COUT_
     std::cout<<"out_euler.r =" <<out_euler.roll <<std::endl;
     std::cout<<"out_euler.p =" <<out_euler.pitch <<std::endl;
     std::cout<<"out_euler.y =" <<out_euler.yaw <<std::endl;

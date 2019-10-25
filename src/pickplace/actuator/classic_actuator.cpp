@@ -70,11 +70,21 @@ int ClassicActuator::parseConfig(YAML::Node& yamlNode)
         m_parm.placeConfig.back_vect_z =  node["placeConfig"]["back_vect_z"].as<double>();
     }
     if(node["gripperConfig"]){
+        m_parm.gripperConfig.allowed_coliision = node["gripperConfig"]["allowed_coliision"].as<std::string>();
         m_parm.gripperConfig.joint_name = node["gripperConfig"]["joint_name"].as<std::string>();
         m_parm.gripperConfig.open_position = node["gripperConfig"]["open_position"].as<double>();
         m_parm.gripperConfig.close_position = node["gripperConfig"]["close_position"].as<double>();
     }
 
+#ifdef jointConstraints
+    if(node["jointConstraints"]){
+        m_parm.jointConstraints.joint_name = node["jointConstraints"]["joint_name"].as<std::vector<std::string> >();
+        m_parm.jointConstraints.position = node["jointConstraints"]["position"].as<std::vector<double> >();
+        m_parm.jointConstraints.above = node["jointConstraints"]["above"].as<std::vector<double> >();
+        m_parm.jointConstraints.below = node["jointConstraints"]["below"].as<std::vector<double> >();
+        m_parm.jointConstraints.weight = node["jointConstraints"]["weight"].as<std::vector<double> >();
+    }
+#endif
 
     addBaseTable();
 
@@ -117,7 +127,18 @@ int ClassicActuator::parseConfig(YAML::Node& yamlNode)
 
         "m_parm.gripperConfig.joint_name:"<<m_parm.gripperConfig.joint_name<<std::endl<<
         "m_parm.gripperConfig.open_position:"<<m_parm.gripperConfig.open_position<<std::endl<<
-        "m_parm.gripperConfig.close_position:"<<m_parm.gripperConfig.close_position<<std::endl;
+        "m_parm.gripperConfig.close_position:"<<m_parm.gripperConfig.close_position<<std::endl<<
+        "m_parm.gripperConfig.allowed_coliision:"<<m_parm.gripperConfig.allowed_coliision<<std::endl;
+
+#ifdef jointConstraints
+    for(int i = 0 ; i < m_parm.jointConstraints.joint_name.size(); i++){
+        std::cout<<"m_parm.jointConstraints.joint_name["<<i<<"]:"<<m_parm.jointConstraints.joint_name[i]<<std::endl;
+        std::cout<<"m_parm.jointConstraints.position["<<i<<"]:"<<m_parm.jointConstraints.position[i]<<std::endl;
+        std::cout<<"m_parm.jointConstraints.above["<<i<<"]:"<<m_parm.jointConstraints.above[i]<<std::endl;
+        std::cout<<"m_parm.jointConstraints.below["<<i<<"]:"<<m_parm.jointConstraints.below[i]<<std::endl;
+        std::cout<<"m_parm.jointConstraints.weight["<<i<<"]:"<<m_parm.jointConstraints.weight[i]<<std::endl;
+    }
+#endif
 
 //        "m_parm.pickConfig.m_Roll:"<<m_parm.pickConfig.m_Roll<<
 //        "m_parm.pickConfig.m_Pitch:"<<m_parm.pickConfig.m_Pitch<<
@@ -231,7 +252,7 @@ int ClassicActuator::showObject(PoseStamped object_pose)
 #endif
 
     if(m_parm.geometry.mesh == "NULL"){
-        addCollisionObject("object");
+        addCollisionObject(OBJECT_ID);
         addCollision();
     }
     else{
@@ -244,7 +265,7 @@ int ClassicActuator::showObject(PoseStamped object_pose)
 
 int ClassicActuator::removeObject()
 {
-    dettachCollision("object");
+    dettachCollision(OBJECT_ID);
     removeCollision();
     return 0;
 }
@@ -337,7 +358,7 @@ int ClassicActuator::showObjectMash(std::string obj_path)
     ros::NodeHandle n;
     moveit_msgs::CollisionObject collision_object;
     collision_object.header.frame_id = _boxPose.header.frame_id;
-    collision_object.id = "object";
+    collision_object.id = OBJECT_ID;
     shapes::Mesh* m = shapes::createMeshFromResource(obj_path);
     shape_msgs::Mesh shelf_mesh;
     shapes::ShapeMsg shelf_mesh_msg;
@@ -447,6 +468,39 @@ int ClassicActuator::getDiraction(geometry_msgs::PoseStamped pose, std::vector<d
     quat.y = pose.pose.orientation.y;
     quat.z = pose.pose.orientation.z;
 
+#ifdef _QUAT_VECT_
+
+    if(quat.w != 1.0){
+        double xta = acos(quat.w);
+        double sw = sin(xta);
+
+        std::cout<<"qv xta =" << xta <<std::endl;
+        std::cout<<"sw =" << sw <<std::endl;
+
+        vect.vect_x = quat.x / sw;
+        vect.vect_y = quat.y / sw;
+        vect.vect_z = quat.z / sw;
+    }
+    else{
+        vect.vect_x = 1;
+        vect.vect_y = 0;
+        vect.vect_z = 0;
+    }
+
+    std::cout<<"qv quat.w =" <<pose.pose.orientation.w <<std::endl;
+    std::cout<<"qv quat.x =" <<pose.pose.orientation.x <<std::endl;
+    std::cout<<"qv quat.y =" <<pose.pose.orientation.y <<std::endl;
+    std::cout<<"qv quat.z =" <<pose.pose.orientation.z <<std::endl;
+    std::cout<<"qv vect.vect_x =" <<vect.vect_x <<std::endl;
+    std::cout<<"qv vect.vect_y =" <<vect.vect_y <<std::endl;
+    std::cout<<"qv vect.vect_z =" <<vect.vect_z <<std::endl;
+    std::cout<<"cos45 =" <<cos(45) <<std::endl;
+    std::cout<<"cosr45 =" <<cos(0.7854) <<std::endl;
+
+#endif
+
+#define _EULER_VECT_
+#ifdef _EULER_VECT_
     quaternionToEuler(quat, pick_euler);
 
     if((fabs(pick_euler.pitch - 1.5708) <= esp) && pick_euler.yaw == 0){
@@ -461,6 +515,7 @@ int ClassicActuator::getDiraction(geometry_msgs::PoseStamped pose, std::vector<d
     }
 
     makeMoreQuat(pick_euler, Roll, Pitch, Yaw, quats);
+#endif
 
 #ifdef _COUT_
     std::cout<<"pick_euler.roll =" << pick_euler.roll <<std::endl;
@@ -565,7 +620,7 @@ int ClassicActuator::makeGrasp()
     grasp_pose.grasp_pose.pose.position.y = m_pickPose.pose.position.y;
     grasp_pose.grasp_pose.pose.position.z = m_pickPose.pose.position.z;
 
-    grasp_pose.allowed_touch_objects.push_back("object");
+    grasp_pose.allowed_touch_objects.push_back(OBJECT_ID);
     grasp_pose.max_contact_force = 0;
     grasp_pose.pre_grasp_posture = makeGripperPosture(m_parm.gripperConfig.open_position);
     grasp_pose.grasp_posture = makeGripperPosture(m_parm.gripperConfig.close_position);
@@ -606,11 +661,26 @@ int ClassicActuator::pick()
     _pickStopFlag = false;
     PoseStamped pickPose;
 
-//    moveToFoName("home");
-
     setMoveitConfig();
 
     IDebug("pick ready!!!!!");
+
+    if(!m_parm.gripperConfig.allowed_coliision.empty() ||
+        m_parm.gripperConfig.allowed_coliision != "NULL"){
+        allowed.setEntry(m_parm.gripperConfig.allowed_coliision, OBJECT_ID, true);
+    }
+
+#ifdef _Constraints_
+
+    for(int i=0; i<m_parm.jointConstraints.joint_name.size(); i++){
+        jointConstraints(m_parm.jointConstraints.joint_name[i],
+                         m_parm.jointConstraints.position[i],
+                         m_parm.jointConstraints.above[i],
+                         m_parm.jointConstraints.below[i],
+                         m_parm.jointConstraints.weight[i]);
+        std::cout<<"count_for:"<<i<<std::endl;
+    }
+#endif
 
     if(m_parm.pickConfig.direct){
         pickPose.frame_id = m_pickPose.header.frame_id;
@@ -627,20 +697,27 @@ int ClassicActuator::pick()
 
     makeGrasp();
 
-    allowed.setEntry("grisper_boby_link", "obkect", true);
-
     IDebug("_graspPoses.size()=%d\n", _graspPoses.size());
     
     while(count < (_graspPoses.size() + 3) && result != MoveItErrorCode::SUCCESS){
          if(_pickStopFlag)
              return -1;
          ROS_ERROR("count = %d\n", count);
-         result = _moveGroup->pick("object", _graspPoses);
+         result = _moveGroup->pick(OBJECT_ID, _graspPoses);
          loope.sleep();
          count ++;
          ROS_ERROR("result = %d\n", result);
     }
+
+#ifdef jointConstraints
+    _vecCons.joint_constraints.clear();
+#endif
+
     if(!result){
+        if(!m_parm.gripperConfig.allowed_coliision.empty() ||
+            m_parm.gripperConfig.allowed_coliision != "NULL"){
+            allowed.removeEntry(m_parm.gripperConfig.allowed_coliision, OBJECT_ID);
+        }
         return -1;
     }
     return 0;
@@ -679,7 +756,7 @@ int ClassicActuator::makePlace()
     placeLocPos.place_pose.pose.position.x = m_placePose.pose.position.x;
     placeLocPos.place_pose.pose.position.y = m_placePose.pose.position.y;
     placeLocPos.place_pose.pose.position.z = m_placePose.pose.position.z;
-    placeLocPos.allowed_touch_objects.push_back("object");
+    placeLocPos.allowed_touch_objects.push_back(OBJECT_ID);
     //placeLocPos.max_contact_force = 0;
     placeLocPos.post_place_posture = makeGripperPosture(m_parm.gripperConfig.close_position);
     placeLocPos.post_place_posture = makeGripperPosture(m_parm.gripperConfig.open_position);
@@ -723,6 +800,17 @@ int ClassicActuator::place()
 
     setMoveitConfig();
 
+#ifdef jointConstraints
+    for(int i=0; i<m_parm.jointConstraints.joint_name.size(); i++){
+        jointConstraints(m_parm.jointConstraints.joint_name[i],
+                         m_parm.jointConstraints.position[i],
+                         m_parm.jointConstraints.above[i],
+                         m_parm.jointConstraints.below[i],
+                         m_parm.jointConstraints.weight[i]);
+        std::cout<<"count_for:"<<i<<std::endl;
+    }
+#endif
+
     if(m_parm.placeConfig.direct){
 
         result = MoveItErrorCode::SUCCESS;
@@ -749,23 +837,44 @@ int ClassicActuator::place()
             if(_pickStopFlag)
                 return -1;
             ROS_ERROR("count = %d\n", count);
-            result = _moveGroup->place("object",_placeLocPoses);
+            result = _moveGroup->place(OBJECT_ID,_placeLocPoses);
             loope.sleep();
             count ++;
             ROS_ERROR("result = %d\n", result);
         }
     }
     sleep(0.5);
-    dettachCollision("object");
-    gripperOpen(500);
+    dettachCollision(OBJECT_ID);
     sleep(0.5);
     removeCollision();
     sleep(0.5);
-   // moveToFoName("home");
+    if(!m_parm.gripperConfig.allowed_coliision.empty() ||
+        m_parm.gripperConfig.allowed_coliision != "NULL"){
+        allowed.removeEntry(m_parm.gripperConfig.allowed_coliision, OBJECT_ID);
+    }
+
+#ifdef jointConstraints
+    _vecCons.joint_constraints.clear();
+#endif
+
     if(!result || ret != 0){
         return -1;
     }
     return 0;
+}
+
+void ClassicActuator::jointConstraints(std::string jointName, double position, double above, double below,double weight)
+{
+#ifdef jointConstraints
+    moveit_msgs::JointConstraint jocm;
+    jocm.joint_name = jointName;
+    jocm.position = position;
+    jocm.tolerance_above = above;
+    jocm.tolerance_below = below;
+    jocm.weight = weight;
+    _vecCons.joint_constraints.push_back(jocm);
+#endif
+    return;
 }
 
 int ClassicActuator::stopPickplace()
@@ -773,23 +882,10 @@ int ClassicActuator::stopPickplace()
     _pickStopFlag = true;
     _moveGroup->stop();
     sleep(1.0);
-    dettachCollision("object");
+    dettachCollision(OBJECT_ID);
     sleep(2.0);
     removeCollision();
     return 0;
-}
-
-int ClassicActuator::gripperOpen(int speed)
-{
-	ros::ServiceClient client_gripperOpen = npick.serviceClient<hsr_gripper_driver::open_srv>("gripper_open");
-    hsr_gripper_driver::open_srv gripperOpen_srv;
-	gripperOpen_srv.request.speed = speed;
-    if(client_gripperOpen.call(gripperOpen_srv)){
-        IDebug("Open the Gripper sucessful!!!");
-	}
-	else{
-        IErrorPrint("Open the Gripper failed!!!");
-	}	
 }
 
  H_EXPORT_PLUGIN(ClassicActuator, "ClassicActuator", "1.0")

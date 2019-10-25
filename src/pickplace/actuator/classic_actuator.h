@@ -17,10 +17,9 @@
 #include <geometric_shapes/shape_operations.h>
 #include <geometric_shapes/mesh_operations.h>
 #include <moveit/collision_detection/collision_matrix.h>
+#include <moveit_msgs/Constraints.h>
 
 #include "msgs/posestamped.h"
-
-#include "hsr_gripper_driver/open_srv.h"
 
 #include <utils/idebug.h>
 #include "pickplace/execute_process.h"
@@ -28,6 +27,7 @@
 #include "hpluginloader.h"
 
 #define MOVE_GROUP "arm"
+#define OBJECT_ID "object"
 
 using namespace hirop_pickplace;
 using namespace moveit::planning_interface;
@@ -72,10 +72,20 @@ class ClassicActuator:public CBasePickPlace{
     }PickConfig;
 
     typedef struct GripperConfig{
+        std::string allowed_coliision;
         std::string joint_name;
         double open_position;
         double close_position;
+
     }GripperConfig;
+
+    typedef struct JointConstraints{
+        std::vector<std::string> joint_name;
+        std::vector<double> position;
+        std::vector<double> above;
+        std::vector<double> below;
+        std::vector<double> weight;
+    }JointConstraints;
 
     typedef struct Parameters{
         Geometry geometry;
@@ -83,6 +93,7 @@ class ClassicActuator:public CBasePickPlace{
         PickPlaceConfig pickConfig;
         PickPlaceConfig placeConfig;
         GripperConfig gripperConfig;
+        JointConstraints jointConstraints;
     }Parameters;
 
 public:
@@ -311,12 +322,7 @@ private:
      */
     trajectory_msgs::JointTrajectory makeGripperPosture(double jiont_position);
 
-    /**
-     * @brief gripperOpen 打开夹爪
-     * @param speed
-     * @return
-     */
-    int gripperOpen(int speed);
+    void jointConstraints(std::string jointName, double position, double above, double below,double weight);
 
 private:
     Parameters m_parm;
@@ -335,7 +341,8 @@ private:
     collision_detection::AllowedCollisionMatrix allowed;
     const std::string _enfLink;
     bool _pickStopFlag;
-    const double esp = 1e-3;
+    const double esp = 1e-1;
+    moveit_msgs::Constraints _vecCons;
 };
 H_DECLARE_PLUGIN(hirop_pickplace::IPickPlace)
 #endif // PICK_EXCUTE_H
