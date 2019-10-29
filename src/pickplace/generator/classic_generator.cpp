@@ -93,14 +93,21 @@ int ClassicGenerator::genPickPose()
              <<"orientation.y:"<<m_pickpose.pose.orientation.y<<std::endl
              <<"orientation.x:"<<m_pickpose.pose.orientation.z<<std::endl;
     std::cout<<"con_euler_r:"<<origin_euler.roll<<std::endl
-             <<"con_euler_y:"<<origin_euler.yaw<<std::endl
-             <<"con_euler_p:"<<origin_euler.pitch<<std::endl;
+             <<"con_euler_p:"<<origin_euler.pitch<<std::endl
+             <<"con_euler_y:"<<origin_euler.yaw<<std::endl;
 #endif
 
     if(!m_parm.sorting){
         correct_euler(origin_euler, cor_euler);
         origin_euler = cor_euler;
     }
+
+//    double mid_r = origin_euler.roll;
+//    double mid_p = origin_euler.pitch;
+//    double mid_y = origin_euler.yaw;
+
+//    origin_euler.roll = mid_y;
+//    origin_euler.yaw = mid_r;
 
     if(!m_parm.follow_R){
         origin_euler.roll = 0;
@@ -116,7 +123,59 @@ int ClassicGenerator::genPickPose()
     origin_euler.pitch += m_parm.dir_P;
     origin_euler.yaw += m_parm.dir_Y;
 
+//    if(origin_euler.roll >= 0 )
+//        origin_euler.roll += m_parm.dir_R;
+//    else
+//        origin_euler.roll = -(origin_euler.roll + m_parm.dir_R);
+
+//    if(origin_euler.pitch >= 0 )
+//        origin_euler.pitch += m_parm.dir_P;
+//    else
+//        origin_euler.pitch = -(origin_euler.pitch + m_parm.dir_P);
+
+//    if(origin_euler.yaw >= 0 )
+//        origin_euler.yaw += m_parm.dir_Y;
+//    else
+//        origin_euler.yaw = -(origin_euler.yaw + m_parm.dir_Y);
+
     euler_to_quaternion(origin_euler, quat);
+
+#define _euler_
+#ifdef _euler_
+
+    euler ori_euler1,ori_eulrr2;
+    Quaternion quat1,quat2;
+    ori_euler1.roll = 0;
+    ori_euler1.pitch = 1.57;
+    ori_euler1.yaw = 0;
+
+    euler_to_quaternion(ori_euler1, quat1);
+    quaternion_to_euler(quat1,ori_eulrr2);
+    ori_eulrr2.roll = origin_euler.yaw;
+    ori_eulrr2.pitch = 1.57;
+    ori_eulrr2.yaw = origin_euler.roll;
+    euler_to_quaternion(ori_eulrr2, quat2);
+
+
+#ifdef _COUT_
+    std::cout<<"m_pickPose.px,"
+    <<"m_pickPose.py,"
+    <<"m_pickPose.pz,"
+    <<"m_pickPose.qx,"
+    <<"m_pickPose.qy,"
+    <<"m_pickPose.qz,"
+    <<"m_pickPose.qw ="
+
+    <<m_pickpose.pose.position.x<<" "
+    <<m_pickpose.pose.position.y<<" "
+    <<m_pickpose.pose.position.z<<" "
+    <<quat2.x <<" "
+    <<quat2.y<<" "
+    <<quat2.z<<" "
+    <<quat2.w <<std::endl;
+#endif
+
+#endif
 
     m_pickpose.pose.position.x += m_parm.offset_x;
     m_pickpose.pose.position.y += m_parm.offset_y;
@@ -129,8 +188,8 @@ int ClassicGenerator::genPickPose()
              <<"orientation.y:"<<m_pickpose.pose.orientation.y<<std::endl
              <<"orientation.x:"<<m_pickpose.pose.orientation.z<<std::endl;
     std::cout<<"origin_euler_r:"<<origin_euler.roll<<std::endl
-             <<"origin_euler_p:"<<origin_euler.yaw<<std::endl
-             <<"origin_euler_y:"<<origin_euler.pitch<<std::endl;
+             <<"origin_euler_p:"<<origin_euler.pitch<<std::endl
+             <<"origin_euler_y:"<<origin_euler.yaw<<std::endl;
 #endif
 
 #ifdef _COUT_

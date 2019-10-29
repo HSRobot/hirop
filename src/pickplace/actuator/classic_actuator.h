@@ -342,6 +342,7 @@ private:
     const std::string _enfLink;
     bool _pickStopFlag;
     const double esp = 1e-1;
+    const double scale = 0.3;
     moveit_msgs::Constraints _vecCons;
 };
 H_DECLARE_PLUGIN(hirop_pickplace::IPickPlace)

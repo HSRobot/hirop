@@ -8,11 +8,11 @@ parameters:
       talbe_link: base_link
       table_pose_x: 0
       table_pose_y: 0
-      table_pose_z: -0.25
+      table_pose_z: 0
     moveitConfig: 
       plannerId: NULL
-      velocity: 0.3
-      accelerated: 0.5
+      velocity: 0.2
+      accelerated: 0.1
       
     pickConfig: 
       direct_pick: false
@@ -33,28 +33,28 @@ parameters:
     placeConfig: 
       direct_place: true
       pre_dist_min: 0.01
-      pre_dist_max: 0.1
+      pre_dist_max: 0.05
       pre_vect_x: 0
       pre_vect_y: 0
       pre_vect_z: 0
       back_dist_min: 0.01
-      back_dist_max: 0.1
+      back_dist_max: 0.05
       back_vect_x: 0
       back_vect_y: 0
-      back_vect_z: 1.7
+      back_vect_z: 0
       Roll: []
       Pitch: []
       Yaw: []
     
     gripperConfig:
-      joint_name: right_finger_1_joint
+      joint_name: pickup_gripper_joint
       open_position: 0.0
       close_position: -0.3491
-      allowed_coliision: right_finger_1_joint
+      allowed_coliision: pickup_gripper_joint
 
     jointConstraints:
-      joint_name: [joint_3,joint_5,joint_6]
-      position: [4.6,0,0]
-      above: [0,1.68,0.1]
-      below: [2,0.8,0.1]
-      weight: [1,1,1]
+      joint_name: []
+      position: []
+      above: []
+      below: []
+      weight: []

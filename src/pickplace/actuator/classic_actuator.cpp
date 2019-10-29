@@ -504,14 +504,19 @@ int ClassicActuator::getDiraction(geometry_msgs::PoseStamped pose, std::vector<d
     quaternionToEuler(quat, pick_euler);
 
     if((fabs(pick_euler.pitch - 1.5708) <= esp) && pick_euler.yaw == 0){
-        vect.vect_x = 0;
-        vect.vect_y = 0;
-        vect.vect_z = -(sin(pick_euler.pitch));
+        vect.vect_x = 0 * scale;
+        vect.vect_y = 0 * scale;
+        vect.vect_z = -(sin(pick_euler.pitch) * scale);
     }
     else{
-        vect.vect_x = cos(pick_euler.yaw);
-        vect.vect_y = sin(pick_euler.yaw);
-        vect.vect_z = -sin(pick_euler.pitch);
+#ifdef _VECT_CH_
+        vect.vect_x = cos(pick_euler.pitch) * scale;
+        vect.vect_y = sin(pick_euler.yaw) * scale;
+        vect.vect_z = -(sin(pick_euler.pitch) * scale);
+#endif
+        vect.vect_z = -(sin(pick_euler.pitch) * scale);
+        vect.vect_x = ((cos(pick_euler.pitch) * cos(pick_euler.yaw))) * scale;
+        vect.vect_y = ((cos(pick_euler.pitch) * sin(pick_euler.yaw))) * scale;
     }
 
     makeMoreQuat(pick_euler, Roll, Pitch, Yaw, quats);
@@ -648,6 +653,25 @@ int ClassicActuator::makeGrasp()
 
         grasp_pose.id = "0";
         _graspPoses.push_back(grasp_pose);
+
+#ifdef _COUT_
+    std::cout<<"m_pickPose.px,"
+    <<"m_pickPose.py,"
+    <<"m_pickPose.pz,"
+    <<"m_pickPose.qx,"
+    <<"m_pickPose.qy,"
+    <<"m_pickPose.qz,"
+    <<"m_pickPose.qw ="
+
+    <<m_pickPose.pose.position.x<<" "
+    <<m_pickPose.pose.position.y<<" "
+    <<m_pickPose.pose.position.z<<" "
+    <<m_pickPose.pose.orientation.x<<" "
+    <<m_pickPose.pose.orientation.y<<" "
+    <<m_pickPose.pose.orientation.z<<" "
+    <<m_pickPose.pose.orientation.w <<std::endl;
+#endif
+
     }
 
     return 0;
@@ -726,29 +750,49 @@ int ClassicActuator::pick()
 
 int ClassicActuator::makePlace()
 {
-    pick_vect vect;
+    pick_vect vect, pre_vect, back_vect;
     std::vector<Quaternion> quats;
     moveit_msgs::PlaceLocation placeLocPos;
     _placeLocPoses.clear();
 
-    getDiraction(m_pickPose, m_parm.placeConfig.m_Roll, m_parm.placeConfig.m_Pitch,
+    getDiraction(m_placePose, m_parm.placeConfig.m_Roll, m_parm.placeConfig.m_Pitch,
                  m_parm.placeConfig.m_Yaw, vect, quats);
+
+
+    if(m_parm.placeConfig.pre_vect_x == 0 && m_parm.placeConfig.pre_vect_y == 0 && m_parm.placeConfig.pre_vect_z == 0){
+        pre_vect = vect;
+    }
+    else{
+        pre_vect.vect_x = m_parm.placeConfig.pre_vect_x;
+        pre_vect.vect_y = m_parm.placeConfig.pre_vect_y;
+        pre_vect.vect_z = m_parm.placeConfig.pre_vect_z;
+    }
+    if(m_parm.placeConfig.back_vect_x == 0 && m_parm.placeConfig.back_vect_y == 0 && m_parm.placeConfig.back_vect_z == 0){
+        back_vect.vect_x = -(vect.vect_x);
+        back_vect.vect_y = -(vect.vect_y);
+        back_vect.vect_z = -(vect.vect_z);
+    }
+    else{
+        back_vect.vect_x = m_parm.placeConfig.back_vect_x;
+        back_vect.vect_y = m_parm.placeConfig.back_vect_y;
+        back_vect.vect_z = m_parm.placeConfig.back_vect_z;
+    }
 
     placeLocPos.place_pose.header.frame_id = m_placePose.header.frame_id;
 
     //放置进给位置
     placeLocPos.pre_place_approach.direction.header.frame_id = m_placePose.header.frame_id;
-    placeLocPos.pre_place_approach.direction.vector.x = m_parm.placeConfig.pre_vect_x;
-    placeLocPos.pre_place_approach.direction.vector.y = m_parm.placeConfig.pre_vect_y;
-    placeLocPos.pre_place_approach.direction.vector.z = m_parm.placeConfig.pre_vect_z;
+    placeLocPos.pre_place_approach.direction.vector.x = pre_vect.vect_x;
+    placeLocPos.pre_place_approach.direction.vector.y = pre_vect.vect_y;
+    placeLocPos.pre_place_approach.direction.vector.z = pre_vect.vect_z;
     placeLocPos.pre_place_approach.min_distance = m_parm.placeConfig.pre_dist_min;
     placeLocPos.pre_place_approach.desired_distance = m_parm.placeConfig.pre_dist_max;
 
     //放置回退位置
     placeLocPos.post_place_retreat.direction.header.frame_id = m_placePose.header.frame_id;
-    placeLocPos.post_place_retreat.direction.vector.x = m_parm.placeConfig.back_vect_x;
-    placeLocPos.post_place_retreat.direction.vector.y = m_parm.placeConfig.back_vect_y;
-    placeLocPos.post_place_retreat.direction.vector.z = m_parm.placeConfig.back_vect_z;
+    placeLocPos.post_place_retreat.direction.vector.x = back_vect.vect_x;
+    placeLocPos.post_place_retreat.direction.vector.y = back_vect.vect_y;
+    placeLocPos.post_place_retreat.direction.vector.z = back_vect.vect_z;
     placeLocPos.post_place_retreat.min_distance = m_parm.placeConfig.back_dist_min;
     placeLocPos.post_place_retreat.desired_distance = m_parm.placeConfig.back_dist_max;
 
@@ -758,7 +802,6 @@ int ClassicActuator::makePlace()
     placeLocPos.place_pose.pose.position.z = m_placePose.pose.position.z;
     placeLocPos.allowed_touch_objects.push_back(OBJECT_ID);
     //placeLocPos.max_contact_force = 0;
-    placeLocPos.post_place_posture = makeGripperPosture(m_parm.gripperConfig.close_position);
     placeLocPos.post_place_posture = makeGripperPosture(m_parm.gripperConfig.open_position);
 
     std::stringstream ss;
@@ -782,6 +825,8 @@ int ClassicActuator::makePlace()
         placeLocPos.place_pose.pose.orientation.z = m_placePose.pose.orientation.z;
         placeLocPos.id = "0";
         _placeLocPoses.push_back(placeLocPos);
+
+
     }
 
     return 0;
@@ -799,6 +844,11 @@ int ClassicActuator::place()
     IDebug("place start!!!!!");
 
     setMoveitConfig();
+
+    if(!m_parm.gripperConfig.allowed_coliision.empty() ||
+        m_parm.gripperConfig.allowed_coliision != "NULL"){
+        allowed.setEntry(m_parm.gripperConfig.allowed_coliision, OBJECT_ID, true);
+    }
 
 #ifdef jointConstraints
     for(int i=0; i<m_parm.jointConstraints.joint_name.size(); i++){
@@ -825,24 +875,24 @@ int ClassicActuator::place()
         pose.pose.orientation.y = m_placePose.pose.orientation.y;
         pose.pose.orientation.z = m_placePose.pose.orientation.z;
 
-        ret = moveToPos(pose);
+        return moveToPos(pose);
     }
-    else{
-        ret = 0;
-        makePlace();
 
-        IDebug("place ready!!!!!");
+    ret = 0;
+    makePlace();
 
-        while(count < (_placeLocPoses.size() + 3) && result != MoveItErrorCode::SUCCESS){
-            if(_pickStopFlag)
-                return -1;
-            ROS_ERROR("count = %d\n", count);
-            result = _moveGroup->place(OBJECT_ID,_placeLocPoses);
-            loope.sleep();
-            count ++;
-            ROS_ERROR("result = %d\n", result);
-        }
+    IDebug("place ready!!!!!");
+
+    while(count < (_placeLocPoses.size() + 3) && result != MoveItErrorCode::SUCCESS){
+        if(_pickStopFlag)
+            return -1;
+        ROS_ERROR("count = %d\n", count);
+        result = _moveGroup->place(OBJECT_ID, _placeLocPoses);
+        loope.sleep();
+        count ++;
+        ROS_ERROR("result = %d\n", result);
     }
+
     sleep(0.5);
     dettachCollision(OBJECT_ID);
     sleep(0.5);
