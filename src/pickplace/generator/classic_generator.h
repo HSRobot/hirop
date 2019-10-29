@@ -45,6 +45,13 @@ struct Sparameter{
     float p_offset_z;
 }parameter;
 
+struct VecTan{
+    double vx;
+    double vy;
+    double vz;
+    double tan;
+}Vectan;
+
 public:
 
     /**
@@ -114,7 +121,7 @@ private:
      * @brief 调整欧拉角
      * @return
      */
-    int correct_euler(euler, euler&);
+    int correctEuler(euler, euler&);
 
     /**
      * @brief 四元数转欧拉角
@@ -122,7 +129,7 @@ private:
      * @param 输出四元数
      * @return 0 成功， -1 失败
      */
-    int quaternion_to_euler(Quaternion quat,euler& euler);
+    int quaternionToEuler(Quaternion quat,euler& euler);
 
     /**
      * @brief 欧拉角转四元素
@@ -130,7 +137,11 @@ private:
      * @param quat ，输出，四元素
      * @return 0
      */
-    int euler_to_quaternion(euler euler, Quaternion& quat);
+    int eulerToQuaternion(euler euler, Quaternion& quat);
+
+    int quatPro(Quaternion quat1, Quaternion quat2, Quaternion &quat3);
+
+    int quatFromVector(VecTan vec, Quaternion& quat);
 
 //    template<typename T>
 //    T getParam(const YAML::Node& ndoe, const std::string& name, T& defaultValue);
@@ -140,6 +151,7 @@ private:
    PoseStamped m_pickpose;
    PoseStamped m_placepose;
    euler _pick_euler;
+
 };
 
 H_DECLARE_PLUGIN(IGenerator)
