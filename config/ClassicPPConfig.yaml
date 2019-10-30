@@ -11,8 +11,8 @@ parameters:
       table_pose_z: 0
     moveitConfig: 
       plannerId: NULL
-      velocity: 0.2
-      accelerated: 0.1
+      velocity: 0.3
+      accelerated: 0.3
       
     pickConfig: 
       direct_pick: false

@@ -45,13 +45,6 @@ struct Sparameter{
     float p_offset_z;
 }parameter;
 
-struct VecTan{
-    double vx;
-    double vy;
-    double vz;
-    double tan;
-}Vectan;
-
 public:
 
     /**
@@ -141,7 +134,9 @@ private:
 
     int quatPro(Quaternion quat1, Quaternion quat2, Quaternion &quat3);
 
-    int quatFromVector(VecTan vec, Quaternion& quat);
+    int quatFromVector(double vec[4], Quaternion& quat);
+
+    int quatConvect(Quaternion &quatConvect);
 
 //    template<typename T>
 //    T getParam(const YAML::Node& ndoe, const std::string& name, T& defaultValue);

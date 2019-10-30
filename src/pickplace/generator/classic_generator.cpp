@@ -125,53 +125,11 @@ int ClassicGenerator::genPickPose()
 
     eulerToQuaternion(origin_euler, quat);
 
-#ifdef _euler_
-
-    euler ori_euler1,ori_eulrr2;
-    Quaternion quat1,quat2;
-    ori_euler1.roll = 0;
-    ori_euler1.pitch = 1.57;
-    ori_euler1.yaw = 0;
-
-    euler_to_quaternion(ori_euler1, quat1);
-    quaternion_to_euler(quat1,ori_eulrr2);
-    ori_eulrr2.roll = origin_euler.yaw;
-    ori_eulrr2.pitch = 1.57;
-    ori_eulrr2.yaw = origin_euler.roll;
-    euler_to_quaternion(ori_eulrr2, quat2);
-
-
-#ifdef _COUT_
-    std::cout<<"m_pickPose.px,"
-    <<"m_pickPose.py,"
-    <<"m_pickPose.pz,"
-    <<"m_pickPose.qx,"
-    <<"m_pickPose.qy,"
-    <<"m_pickPose.qz,"
-    <<"m_pickPose.qw ="
-
-    <<m_pickpose.pose.position.x<<" "
-    <<m_pickpose.pose.position.y<<" "
-    <<m_pickpose.pose.position.z<<" "
-    <<quat2.x <<" "
-    <<quat2.y<<" "
-    <<quat2.z<<" "
-    <<quat2.w <<std::endl;
-#endif
-#endif
-
 #define _QUATPRO_
 #ifdef _QUATPRO_
-    Quaternion quatVer, quatConvect;
-    VecTan vec;
-    vec.vx = 0;
-    vec.vy = 1;
-    vec.vz = 0;
-    vec.tan = 1.57;
+    Quaternion quatCon;
 
-    quatFromVector(vec, quatVer);
-
-    quatPro(m_pickpose.pose.orientation, quatVer, quatConvect);
+    quatConvect(quatCon);
 
 #ifdef _COUT_
     std::cout<<"quatConvect.px,"
@@ -185,10 +143,10 @@ int ClassicGenerator::genPickPose()
               <<m_pickpose.pose.position.x<<" "
               <<m_pickpose.pose.position.y<<" "
               <<m_pickpose.pose.position.z<<" "
-              <<quatConvect.x <<" "
-              <<quatConvect.y<<" "
-              <<quatConvect.z<<" "
-              <<quatConvect.w <<std::endl;
+              <<quatCon.x <<" "
+              <<quatCon.y<<" "
+              <<quatCon.z<<" "
+              <<quatCon.w <<std::endl;
 #endif
 
 #endif
@@ -196,7 +154,7 @@ int ClassicGenerator::genPickPose()
     m_pickpose.pose.position.x += m_parm.offset_x;
     m_pickpose.pose.position.y += m_parm.offset_y;
     m_pickpose.pose.position.z += m_parm.offset_z;
-    m_pickpose.pose.orientation = quat;
+    m_pickpose.pose.orientation = quatCon;
 
 #ifdef _COUT_
     std::cout<<"orientation.w:"<<m_pickpose.pose.orientation.w<<std::endl
@@ -311,12 +269,17 @@ int ClassicGenerator::quatPro(Quaternion quat1, Quaternion quat2, Quaternion &qu
     return 0;
 }
 
-int ClassicGenerator::quatFromVector(VecTan vec, Quaternion &quat)
+int ClassicGenerator::quatFromVector(double vec[4], Quaternion &quat)
 {
-    double qw = cos(vec.tan/2);
-    double qx = sin(vec.tan/2) * vec.vx;
-    double qy = sin(vec.tan/2) * vec.vy;
-    double qz = sin(vec.tan/2) * vec.vz;
+    double vx = vec[0];
+    double vy = vec[1];
+    double vz = vec[2];
+    double tan = vec[3];
+
+    double qw = cos(tan/2);
+    double qx = sin(tan/2) * vx;
+    double qy = sin(tan/2) * vy;
+    double qz = sin(tan/2) * vz;
 
     quat.w = (float)qw;
     quat.x = (float)qx;
@@ -324,6 +287,34 @@ int ClassicGenerator::quatFromVector(VecTan vec, Quaternion &quat)
     quat.z = (float)qz;
 
     return 0;
+
+}
+
+int ClassicGenerator::quatConvect(Quaternion &quatConvect)
+{
+    Quaternion quatOrigin, quatVerCx, quatVerCy, quatVerCz, quatConvectx, quatConvecty, quatConvectz;
+    euler eulerP;
+
+    quaternionToEuler(m_pickpose.pose.orientation, eulerP);
+
+    quatOrigin.w = 1;
+    quatOrigin.x = 0;
+    quatOrigin.y = 0;
+    quatOrigin.z = 0;
+
+    double vecy[4] = {0, 1, 0, (m_parm.dir_P + eulerP.pitch)};
+    quatFromVector(vecy, quatVerCy);
+    quatPro(quatOrigin, quatVerCy, quatConvecty);
+
+    double vecx[4] = {1, 0, 0, (m_parm.dir_R + eulerP.roll)};
+    quatFromVector(vecx, quatVerCx);
+    quatPro(quatConvecty, quatVerCx, quatConvectx);
+
+    double vecz[4] = {0, 0, 1, (m_parm.dir_Y + eulerP.yaw)};
+    quatFromVector(vecz, quatVerCz);
+    quatPro(quatConvectx, quatVerCz, quatConvectz);
+
+    quatConvect = quatConvectz;
 
 }
 
