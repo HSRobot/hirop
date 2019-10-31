@@ -132,21 +132,63 @@ private:
      */
     int eulerToQuaternion(euler euler, Quaternion& quat);
 
+    /**
+     * @brief quatPro,四元数旋转
+     * @param quat1,旋转原始四元数
+     * @param quat2,旋转向量四元数
+     * @param quat3，旋转后的四元数
+     * @return
+     */
     int quatPro(Quaternion quat1, Quaternion quat2, Quaternion &quat3);
 
+    /**
+     * @brief quatFromVector,由向量得到四元数
+     * @param vec,向量数组，分别为　x,y,z,旋转角度
+     * @param quat[out] 旋转向量四元数
+     * @return
+     */
     int quatFromVector(double vec[4], Quaternion& quat);
 
-    int quatConvect(Quaternion &quatConvect);
+    /**
+     * @brief tfQuatRotation 由TF库实现旋转
+     * @param vx 旋转向量x分量
+     * @param vy 旋转向量y分量
+     * @param vz 旋转向量z分量
+     * @param tan 旋转角度
+     * @param quatOrigin，旋转前四元数
+     * @return
+     */
+    Quaternion tfQuatRotation(double vx, double vy, double vz, double tan, Quaternion quatOrigin);
 
-//    template<typename T>
-//    T getParam(const YAML::Node& ndoe, const std::string& name, T& defaultValue);
+    /**
+     * @brief setQuaternion 生成Quaternion类型四元数
+     * @param qx　四元数x值
+     * @param qy　四元数y值
+     * @param qz　四元数z值
+     * @param qw　四元数w值
+     * @return
+     */
+    Quaternion setQuaternion(float qx, float qy, float qz, float qw);
+
+    /**
+     * @brief quatConvect  四元数转换
+     * @param quat　转换前四元数
+     * @param quatConvect　转化后四元数
+     * @return
+     */
+    int quatConvect(Quaternion quat, Quaternion &quatConvect);
+
+    /**
+     * @brief tfQuatConvect tf实现四元数转换
+     * @return
+     */
+    int tfQuatConvect();
 
 private: 
    Sparameter m_parm;
    PoseStamped m_pickpose;
    PoseStamped m_placepose;
    euler _pick_euler;
-
 };
 
 H_DECLARE_PLUGIN(IGenerator)

@@ -71,6 +71,7 @@ int ClassicGenerator::parseConfig(YAML::Node& yamlNode)
 int ClassicGenerator::setPickPose(PoseStamped pickObjPose)
 {
     m_pickpose = pickObjPose;
+    tfQuatConvect();
     return 0;
 }
 
@@ -83,7 +84,9 @@ int ClassicGenerator::setPlacePose(PoseStamped placeObjPose)
 int ClassicGenerator::genPickPose()
 {
     euler origin_euler,cor_euler;
-    Quaternion quat;
+    Quaternion quat_follow;
+
+    quat_follow = m_pickpose.pose.orientation;
 
     quaternionToEuler(m_pickpose.pose.orientation, origin_euler);
 
@@ -102,34 +105,19 @@ int ClassicGenerator::genPickPose()
         origin_euler = cor_euler;
     }
 
-//    double mid_r = origin_euler.roll;
-//    double mid_p = origin_euler.pitch;
-//    double mid_y = origin_euler.yaw;
-
-//    origin_euler.roll = mid_y;
-//    origin_euler.yaw = mid_r;
-
     if(!m_parm.follow_R){
-        origin_euler.roll = 0;
+        quat_follow = tfQuatRotation(1, 0, 0, -(origin_euler.roll), quat_follow);
     }
     if(!m_parm.follow_P){
-        origin_euler.pitch = 0;
+        quat_follow = tfQuatRotation(0, 1, 0, -(origin_euler.pitch), quat_follow);
     }
     if(!m_parm.follow_Y){
-        origin_euler.yaw = 0;
+        quat_follow = tfQuatRotation(0, 0, 1, -(origin_euler.yaw), quat_follow);
     }
 
-    origin_euler.roll += m_parm.dir_R;
-    origin_euler.pitch += m_parm.dir_P;
-    origin_euler.yaw += m_parm.dir_Y;
-
-    eulerToQuaternion(origin_euler, quat);
-
-#define _QUATPRO_
-#ifdef _QUATPRO_
     Quaternion quatCon;
 
-    quatConvect(quatCon);
+    quatConvect(quat_follow, quatCon);
 
 #ifdef _COUT_
     std::cout<<"quatConvect.px,"
@@ -149,24 +137,15 @@ int ClassicGenerator::genPickPose()
               <<quatCon.w <<std::endl;
 #endif
 
-#endif
-
     m_pickpose.pose.position.x += m_parm.offset_x;
     m_pickpose.pose.position.y += m_parm.offset_y;
     m_pickpose.pose.position.z += m_parm.offset_z;
     m_pickpose.pose.orientation = quatCon;
 
 #ifdef _COUT_
-    std::cout<<"orientation.w:"<<m_pickpose.pose.orientation.w<<std::endl
-             <<"orientation.x:"<<m_pickpose.pose.orientation.x<<std::endl
-             <<"orientation.y:"<<m_pickpose.pose.orientation.y<<std::endl
-             <<"orientation.x:"<<m_pickpose.pose.orientation.z<<std::endl;
     std::cout<<"origin_euler_r:"<<origin_euler.roll<<std::endl
              <<"origin_euler_p:"<<origin_euler.pitch<<std::endl
              <<"origin_euler_y:"<<origin_euler.yaw<<std::endl;
-#endif
-
-#ifdef _COUT_
     std::cout<<"frame_id:"<<m_pickpose.frame_id<<std::endl
              <<"m_pickpose.pose.px:"<<m_pickpose.pose.position.x<<std::endl
              <<"m_pickpose.pose.py:"<<m_pickpose.pose.position.y<<std::endl
@@ -290,13 +269,38 @@ int ClassicGenerator::quatFromVector(double vec[4], Quaternion &quat)
 
 }
 
-int ClassicGenerator::quatConvect(Quaternion &quatConvect)
+Quaternion ClassicGenerator::tfQuatRotation(double vx, double vy, double vz, double tan, Quaternion quatOrigin)
 {
-    Quaternion quatOrigin, quatVerCx, quatVerCy, quatVerCz, quatConvectx, quatConvecty, quatConvectz;
+    tf::Quaternion quat;
+    Quaternion quatRet;
+
+    double qw = cos(tan/2);
+    double qx = sin(tan/2) * vx;
+    double qy = sin(tan/2) * vy;
+    double qz = sin(tan/2) * vz;
+
+    tf::Quaternion quatVec(qx, qy, qz, qw);
+    tf::Quaternion quatTfOrigin(quatOrigin.x, quatOrigin.y, quatOrigin.z, quatOrigin.w);
+
+    quat = quatTfOrigin * quatVec; //四元数想乘表示旋转，坐乘右乘右区别
+
+    quatRet.x = quat.getX();
+    quatRet.y = quat.getY();
+    quatRet.z = quat.getZ();
+    quatRet.w = quat.getW();
+
+    return quatRet;
+}
+
+int ClassicGenerator::quatConvect(Quaternion quat, Quaternion &quatConvect)
+{
+    Quaternion quatConvectx, quatConvecty, quatConvectz;
+
+#ifdef _OUAT_
     euler eulerP;
+    quaternionToEuler(quat, eulerP);
 
-    quaternionToEuler(m_pickpose.pose.orientation, eulerP);
-
+    Quaternion quatOrigin, quatVerCx, quatVerCy, quatVerCz,
     quatOrigin.w = 1;
     quatOrigin.x = 0;
     quatOrigin.y = 0;
@@ -313,8 +317,68 @@ int ClassicGenerator::quatConvect(Quaternion &quatConvect)
     double vecz[4] = {0, 0, 1, (m_parm.dir_Y + eulerP.yaw)};
     quatFromVector(vecz, quatVerCz);
     quatPro(quatConvectx, quatVerCz, quatConvectz);
+#endif
+
+    quatConvectx = tfQuatRotation(1,0,0,m_parm.dir_R, quat); //绕自身x轴转
+
+    quatConvecty = tfQuatRotation(0,1,0,m_parm.dir_P, quatConvectx);//绕自身轴转
+
+    quatConvectz = tfQuatRotation(0,0,1,m_parm.dir_Y, quatConvecty);//绕自身z轴转
 
     quatConvect = quatConvectz;
+
+    return 0;
+}
+
+Quaternion ClassicGenerator::setQuaternion(float qx, float qy, float qz, float qw)
+{
+    Quaternion quat;
+
+    quat.x = qx;
+    quat.y = qy;
+    quat.z = qz;
+    quat.w = qw;
+
+    return quat;
+}
+
+int ClassicGenerator::tfQuatConvect()
+{
+    Quaternion quat1,quat2,quat3,quatf;
+
+    quatf = setQuaternion(0,0,0,1);
+
+    quat1 = tfQuatRotation(1,0,0,PI/3, quatf);
+
+    quat2 = tfQuatRotation(0,1,0,PI/3, quat1);
+
+    quat3 = tfQuatRotation(0,0,1,PI/2, quat2);
+
+#ifdef _COUT_
+    std::cout<<"tfQuatConvect.px,"
+              <<"tfQuatConvect.py,"
+              <<"tfQuatConvect.pz,"
+              <<"tfQuatConvect.qx,"
+              <<"tfQuatConvect.qy,"
+              <<"tfQuatConvect.qz,"
+              <<"tfQuatConvect.qw ="
+
+              <<m_pickpose.pose.position.x<<" "
+              <<m_pickpose.pose.position.y<<" "
+              <<m_pickpose.pose.position.z<<" "
+              <<quat2.x <<" "
+              <<quat2.y<<" "
+              <<quat2.z<<" "
+              <<quat2.w <<std::endl
+              <<quat1.x <<" "
+              <<quat1.y<<" "
+              <<quat1.z<<" "
+              <<quat1.w <<std::endl
+              <<quat3.x <<" "
+              <<quat3.y<<" "
+              <<quat3.z<<" "
+              <<quat3.w <<std::endl;
+#endif
 
 }
 
@@ -351,21 +415,6 @@ int ClassicGenerator::correctEuler(euler origin,euler& out_euler)
     return 0;
 #endif
 }
-
-//template<typename T>
-//T getParam(const YAML::Node& node,const std::string& name,const T& defaultValue)
-//{
-//    T v;
-//    try {
-//        v=node[name].as<T>();//读取参数
-//            std::cout<<"Found parameter: "<<name<<",\tvalue: "<<v<<std::endl;//终端提示读取成功
-//    } catch (std::exception e) {
-//       //找不到该参数的话，将返回默认值
-//            v=defaultValue;
-//        std::cout<<"Cannot find parameter: "<<name<<",\tassigning  default: "<<v<<std::endl;
-//    }
-//    return v;
-//}
 
 int ClassicGenerator::stopGenerator()
 {
