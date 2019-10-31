@@ -1,0 +1,12 @@
+FIND_LIBRARY(hirop_pickplace_LIBRARY hirop_pickplace
+    PATHS @CMAKE_INSTALL_PREFIX@/lib
+    NO_DEFAULT_PATH
+)
+SET(hirop_pickplace_LIBRARIES ${hirop_pickplace_LIBRARY})
+
+FIND_PATH(hirop_pickplace_INCLUDE_DIR pickplace/pickplace.h
+    PATHS @CMAKE_INSTALL_PREFIX@/include/hirop
+    NO_DEFAULT_PATH
+)
+
+SET(hirop_pickplace_INCLUDE_DIRS ${hirop_pickplace_INCLUDE_DIR})
