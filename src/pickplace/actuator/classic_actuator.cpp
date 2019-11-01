@@ -37,6 +37,7 @@ int ClassicActuator::parseConfig(YAML::Node& yamlNode)
     }
     if(node["pickConfig"]){
         m_parm.pickConfig.direct = node["pickConfig"]["direct_pick"].as<bool>();
+        m_parm.pickConfig.dist_scale = node["pickConfig"]["dist_scale"].as<double>();
         m_parm.pickConfig.m_Roll = node["pickConfig"]["Roll"].as<std::vector<double> >();
         m_parm.pickConfig.m_Pitch = node["pickConfig"]["Pitch"].as<std::vector<double> >();
         m_parm.pickConfig.m_Yaw = node["pickConfig"]["Yaw"].as<std::vector<double> >();
@@ -54,6 +55,7 @@ int ClassicActuator::parseConfig(YAML::Node& yamlNode)
     }
     if(node["placeConfig"]){
         m_parm.placeConfig.direct = node["placeConfig"]["direct_place"].as<bool>();
+        m_parm.placeConfig.dist_scale = node["placeConfig"]["dist_scale"].as<double>();
         m_parm.placeConfig.m_Roll = node["placeConfig"]["Roll"].as<std::vector<double> >();
         m_parm.placeConfig.m_Pitch = node["placeConfig"]["Pitch"].as<std::vector<double> >();
         m_parm.placeConfig.m_Yaw = node["placeConfig"]["Yaw"].as<std::vector<double> >();
@@ -87,6 +89,8 @@ int ClassicActuator::parseConfig(YAML::Node& yamlNode)
 #endif
 
     addBaseTable();
+    pickScale = m_parm.pickConfig.dist_scale;
+    placeScale = m_parm.placeConfig.dist_scale;
 
 #ifdef _COUT_
     std::cout<<"m_parm.geometry.type:"<<m_parm.geometry.type<<std::endl<<
@@ -458,7 +462,7 @@ int ClassicActuator::eulerToQuaternion(euler euler_angle, Quaternion &quat)
 
 int ClassicActuator::getDiraction(geometry_msgs::PoseStamped pose, std::vector<double> Roll,
                                   std::vector<double> Pitch, std::vector<double> Yaw, pick_vect& vect,
-                                  std::vector<Quaternion>& quats)
+                                  std::vector<Quaternion>& quats, double scale)
 {
     euler pick_euler;
     Quaternion quat;
@@ -582,7 +586,7 @@ int ClassicActuator::makeGrasp()
     _graspPoses.clear();
 
     getDiraction(m_pickPose, m_parm.pickConfig.m_Roll, m_parm.pickConfig.m_Pitch,
-                 m_parm.pickConfig.m_Yaw, vect, quats);
+                 m_parm.pickConfig.m_Yaw, vect, quats, pickScale);
 
     if(m_parm.pickConfig.pre_vect_x == 0 && m_parm.pickConfig.pre_vect_y == 0 && m_parm.pickConfig.pre_vect_z == 0){
         pre_vect = vect;
@@ -756,7 +760,7 @@ int ClassicActuator::makePlace()
     _placeLocPoses.clear();
 
     getDiraction(m_placePose, m_parm.placeConfig.m_Roll, m_parm.placeConfig.m_Pitch,
-                 m_parm.placeConfig.m_Yaw, vect, quats);
+                 m_parm.placeConfig.m_Yaw, vect, quats, placeScale);
 
 
     if(m_parm.placeConfig.pre_vect_x == 0 && m_parm.placeConfig.pre_vect_y == 0 && m_parm.placeConfig.pre_vect_z == 0){

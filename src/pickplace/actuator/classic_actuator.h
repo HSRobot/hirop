@@ -54,6 +54,7 @@ class ClassicActuator:public CBasePickPlace{
     typedef struct PickPlaceConfig
     {
         bool direct;
+        double dist_scale;
         std::vector<double> m_Roll;
         std::vector<double> m_Pitch;
         std::vector<double> m_Yaw;
@@ -243,7 +244,7 @@ private:
      */
     int getDiraction(geometry_msgs::PoseStamped pose, std::vector<double> Roll,
                      std::vector<double> Pitch, std::vector<double> Yaw, pick_vect& vect,
-                     std::vector<Quaternion>& quats);
+                     std::vector<Quaternion>& quats,double scale);
 
     /**
      * @brief makeMoreQuat 生成摇摆数组
@@ -342,7 +343,8 @@ private:
     const std::string _enfLink;
     bool _pickStopFlag;
     const double esp = 1e-1;
-    const double scale = 0.3;
+    double pickScale;
+    double placeScale;
     moveit_msgs::Constraints _vecCons;
 };
 H_DECLARE_PLUGIN(hirop_pickplace::IPickPlace)

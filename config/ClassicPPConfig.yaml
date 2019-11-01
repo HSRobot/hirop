@@ -3,12 +3,12 @@ parameters:
       type: BOX
       L: 0.033
       W: 0.033
-      H: 0.013
+      H: 0.11
       mesh: NULL
       talbe_link: base_link
       table_pose_x: 0
       table_pose_y: 0
-      table_pose_z: 0
+      table_pose_z: -0.25
     moveitConfig: 
       plannerId: NULL
       velocity: 0.3
@@ -16,6 +16,7 @@ parameters:
       
     pickConfig: 
       direct_pick: false
+      dist_scale: 1
       pre_dist_min: 0.01
       pre_dist_max: 0.1
       pre_vect_x: 0
@@ -32,6 +33,7 @@ parameters:
 
     placeConfig: 
       direct_place: true
+      dist_scale: 1
       pre_dist_min: 0.01
       pre_dist_max: 0.05
       pre_vect_x: 0
@@ -47,14 +49,9 @@ parameters:
       Yaw: []
     
     gripperConfig:
-      joint_name: pickup_gripper_joint
+      joint_name: right_finger_2_joint
       open_position: 0.0
       close_position: -0.3491
-      allowed_coliision: pickup_gripper_joint
+      allowed_coliision: NULL
 
-    jointConstraints:
-      joint_name: []
-      position: []
-      above: []
-      below: []
-      weight: []
+
