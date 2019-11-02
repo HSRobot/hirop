@@ -196,11 +196,11 @@ int Detector::setDetector(const std::string &name, const std::string &objectName
             pyDetectors.insert(std::pair<std::string, IDetector *>(name, this->detectorPtr));
         else{
             if(pySingleDetectors.count(name))
-                pySingleDetectors.at(name).insert(std::pair<std::string, IDetector *>(name, this->detectorPtr));
+                pySingleDetectors.at(name).insert(std::pair<std::string, IDetector *>(objectName, this->detectorPtr));
             else{
                 std::map<std::string, IDetector*> tmp;
-                tmp.insert(std::pair<std::string, IDetector *>(name, this->detectorPtr));
-                pySingleDetectors.insert(std::make_pair(objectName, tmp));
+                tmp.insert(std::pair<std::string, IDetector *>(objectName, this->detectorPtr));
+                pySingleDetectors.insert(std::make_pair(name, tmp));
             }
         }
     }else{
