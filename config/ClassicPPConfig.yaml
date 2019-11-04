@@ -26,24 +26,24 @@ parameters:
       back_dist_max: 0.1
       back_vect_x: 0
       back_vect_y: 0
-      back_vect_z: 0
+      back_vect_z: 1
       Roll: []
       Pitch: []
       Yaw: []
 
     placeConfig: 
-      direct_place: true
+      direct_place: false
       dist_scale: 1
       pre_dist_min: 0.01
       pre_dist_max: 0.05
       pre_vect_x: 0
       pre_vect_y: 0
-      pre_vect_z: 0
+      pre_vect_z: -1
       back_dist_min: 0.01
       back_dist_max: 0.05
       back_vect_x: 0
       back_vect_y: 0
-      back_vect_z: 0
+      back_vect_z: 1
       Roll: []
       Pitch: []
       Yaw: []

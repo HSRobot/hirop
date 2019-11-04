@@ -71,7 +71,6 @@ int ClassicGenerator::parseConfig(YAML::Node& yamlNode)
 int ClassicGenerator::setPickPose(PoseStamped pickObjPose)
 {
     m_pickpose = pickObjPose;
-    tfQuatConvect();
     return 0;
 }
 
@@ -101,8 +100,9 @@ int ClassicGenerator::genPickPose()
 #endif
 
     if(!m_parm.sorting){
-        correctEuler(origin_euler, cor_euler);
-        origin_euler = cor_euler;
+        Quaternion quatSort;
+        correctQuat(origin_euler, quat_follow, quatSort);
+        quat_follow = quatSort;
     }
 
     if(!m_parm.follow_R){
@@ -117,7 +117,7 @@ int ClassicGenerator::genPickPose()
 
     Quaternion quatCon;
 
-    quatConvect(quat_follow, quatCon);
+    quatConvect(quat_follow, 1, quatCon);
 
 #ifdef _COUT_
     std::cout<<"quatConvect.px,"
@@ -160,15 +160,11 @@ int ClassicGenerator::genPickPose()
 
 int ClassicGenerator::genPlacePose()
 {
-    euler place_euler;
-    Quaternion place_quat;
+    Quaternion place_quat,quat_origin;
 
-    quaternionToEuler(m_placepose.pose.orientation, place_euler);
-    place_euler.roll += m_parm.p_dir_R;
-    place_euler.pitch += m_parm.p_dir_P;
-    place_euler.yaw += m_parm.p_dir_Y;
+    quat_origin = m_placepose.pose.orientation;
 
-    eulerToQuaternion(place_euler, place_quat);
+    quatConvect(quat_origin, 2, place_quat);
 
     m_placepose.pose.position.x += m_parm.p_offset_x;
     m_placepose.pose.position.y += m_parm.p_offset_y;
@@ -292,7 +288,7 @@ Quaternion ClassicGenerator::tfQuatRotation(double vx, double vy, double vz, dou
     return quatRet;
 }
 
-int ClassicGenerator::quatConvect(Quaternion quat, Quaternion &quatConvect)
+int ClassicGenerator::quatConvect(Quaternion quat, int type, Quaternion &quatConvect)
 {
     Quaternion quatConvectx, quatConvecty, quatConvectz;
 
@@ -318,12 +314,21 @@ int ClassicGenerator::quatConvect(Quaternion quat, Quaternion &quatConvect)
     quatFromVector(vecz, quatVerCz);
     quatPro(quatConvectx, quatVerCz, quatConvectz);
 #endif
+    if(type == 1){
+        quatConvectx = tfQuatRotation(1,0,0,m_parm.dir_R, quat); //绕自身x轴转
 
-    quatConvectx = tfQuatRotation(1,0,0,m_parm.dir_R, quat); //绕自身x轴转
+        quatConvecty = tfQuatRotation(0,1,0,m_parm.dir_P, quatConvectx);//绕自身轴转
 
-    quatConvecty = tfQuatRotation(0,1,0,m_parm.dir_P, quatConvectx);//绕自身轴转
+        quatConvectz = tfQuatRotation(0,0,1,m_parm.dir_Y, quatConvecty);//绕自身z轴转
 
-    quatConvectz = tfQuatRotation(0,0,1,m_parm.dir_Y, quatConvecty);//绕自身z轴转
+    }
+    else if(type == 2){
+        quatConvectx = tfQuatRotation(1,0,0,m_parm.p_dir_R, quat); //绕自身x轴转
+
+        quatConvecty = tfQuatRotation(0,1,0,m_parm.p_dir_P, quatConvectx);//绕自身轴转
+
+        quatConvectz = tfQuatRotation(0,0,1,m_parm.p_dir_Y, quatConvecty);//绕自身z轴转
+    }
 
     quatConvect = quatConvectz;
 
@@ -342,44 +347,36 @@ Quaternion ClassicGenerator::setQuaternion(float qx, float qy, float qz, float q
     return quat;
 }
 
-int ClassicGenerator::tfQuatConvect()
+int ClassicGenerator::correctQuat(euler euler,Quaternion quat, Quaternion& quatCorrect)
 {
-    Quaternion quat1,quat2,quat3,quatf;
+    Quaternion quatPros;
+    quatPros = quat;
 
-    quatf = setQuaternion(0,0,0,1);
+    if(euler.pitch < -(PI/2))
+        quatPros = tfQuatRotation(1,0,0, PI, quatPros); //绕自身x轴转
+    else if(euler.pitch > (PI/2))
+        quatPros = tfQuatRotation(1,0,0, -(PI), quatPros); //绕自身x轴转
+    else
+        ;
 
-    quat1 = tfQuatRotation(1,0,0,PI/3, quatf);
+    if(euler.roll < -(PI/2))
+        quatPros = tfQuatRotation(0,1,0, PI, quatPros);//绕自身y轴转
+    else if(euler.roll  > (PI/2))
+        quatPros = tfQuatRotation(0,1,0, -(PI), quatPros);//绕自身y轴转
+    else
+        ;
 
-    quat2 = tfQuatRotation(0,1,0,PI/3, quat1);
 
-    quat3 = tfQuatRotation(0,0,1,PI/2, quat2);
+    if(euler.yaw < -(PI/2))
+        quatPros = tfQuatRotation(0,0,1, PI, quatPros);//绕自身z轴转
+    else if(euler.yaw > (PI/2))
+        quatPros = tfQuatRotation(0,0,1, -(PI), quatPros);//绕自身z轴转
+    else
+        ;
 
-#ifdef _COUT_
-    std::cout<<"tfQuatConvect.px,"
-              <<"tfQuatConvect.py,"
-              <<"tfQuatConvect.pz,"
-              <<"tfQuatConvect.qx,"
-              <<"tfQuatConvect.qy,"
-              <<"tfQuatConvect.qz,"
-              <<"tfQuatConvect.qw ="
+    quatCorrect = quatPros;
 
-              <<m_pickpose.pose.position.x<<" "
-              <<m_pickpose.pose.position.y<<" "
-              <<m_pickpose.pose.position.z<<" "
-              <<quat2.x <<" "
-              <<quat2.y<<" "
-              <<quat2.z<<" "
-              <<quat2.w <<std::endl
-              <<quat1.x <<" "
-              <<quat1.y<<" "
-              <<quat1.z<<" "
-              <<quat1.w <<std::endl
-              <<quat3.x <<" "
-              <<quat3.y<<" "
-              <<quat3.z<<" "
-              <<quat3.w <<std::endl;
-#endif
-
+    return 0;
 }
 
 int ClassicGenerator::correctEuler(euler origin,euler& out_euler)
