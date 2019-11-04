@@ -118,6 +118,9 @@ void PyBaseDetector::setColorImg(const cv::Mat &inputImg){
     PyObject *ret = PyObject_CallMethod(pClassInstance, "setColorImg", "O", matObj);
     if(!ret)
         PyErr_Print();
+
+    delete colorTmp;
+
 }
 
 void PyBaseDetector::setDepthImg(const cv::Mat &inputImg){
@@ -143,6 +146,8 @@ void PyBaseDetector::setDepthImg(const cv::Mat &inputImg){
 
     if(!ret)
         PyErr_Print();
+
+    delete depthTmp;
 }
 
 int PyBaseDetector::getResult(std::vector<pose> &poses){
@@ -153,7 +158,7 @@ int PyBaseDetector::getResult(std::vector<pose> &poses){
         return -1;
     }
 
-    PyObject* ret =  PyObject_CallMethod(pClassInstance, "getResult", nullptr);
+    PyObject* ret =  PyObject_CallMethod(pClassInstance, "getResult", "");
 
     if(!ret)
         PyErr_Print();
@@ -201,7 +206,8 @@ int PyBaseDetector::getResult(std::vector<pose> &poses){
 
     Py_DECREF(pDataPtr);
     Py_DECREF(ret_array);
-    Py_DECREF(ret);
+
+//    Py_DECREF(ret);
     return 0;
 }
 
