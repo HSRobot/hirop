@@ -88,6 +88,8 @@ public:
      */
     int isMultiDetector();
 
+    bool havePreImg();
+
     /**
      * @brief getPreImg 获取预览图片
      * @param preImg    预览图片
