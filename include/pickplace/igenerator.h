@@ -6,8 +6,6 @@
 #include "hplugin.h"
 #include "pickplace.h"
 
-#define __LINUX__
-
 using namespace hirop;
 
 namespace hirop_pickplace{

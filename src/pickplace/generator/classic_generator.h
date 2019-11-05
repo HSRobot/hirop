@@ -117,6 +117,13 @@ private:
     int correctEuler(euler, euler&);
 
     /**
+     * @brief correctQuat 修正四元数
+     * @return
+     */
+    int correctQuat(euler, Quaternion, Quaternion&);
+
+
+    /**
      * @brief 四元数转欧拉角
      * @param 输入欧拉角
      * @param 输出四元数
@@ -176,13 +183,7 @@ private:
      * @param quatConvect　转化后四元数
      * @return
      */
-    int quatConvect(Quaternion quat, Quaternion &quatConvect);
-
-    /**
-     * @brief tfQuatConvect tf实现四元数转换
-     * @return
-     */
-    int tfQuatConvect();
+    int quatConvect(Quaternion quat, int type, Quaternion &quatConvect);
 
 private: 
    Sparameter m_parm;
