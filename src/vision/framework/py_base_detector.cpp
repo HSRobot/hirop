@@ -207,7 +207,7 @@ int PyBaseDetector::getResult(std::vector<pose> &poses){
     Py_DECREF(pDataPtr);
     Py_DECREF(ret_array);
 
-//    Py_DECREF(ret);
+    //    Py_DECREF(ret);
     return 0;
 }
 
@@ -230,5 +230,52 @@ int PyBaseDetector::parseConfig(const YAML::Node &node){
 }
 
 int PyBaseDetector::getPreImg(cv::Mat &preImg){
+
+    PyLockHelper lock;
+
+    if(!pClassInstance){
+        IErrorPrint("%s", "Python detector getPreImg: the class not instance");
+        return -1;
+    }
+
+    PyObject* ret =  PyObject_CallMethod(pClassInstance, "getPreImg", "");
+
+    if(!ret){
+        PyErr_Print();
+        return -1;
+    }
+    PyArrayObject *ret_array;
+    PyArray_OutputConverter(ret, &ret_array);
+
+    /**
+     * 获取数据维度，每组数据有7维(x, y, z, qx, qy, qz, qw)
+     */
+    npy_intp *shape = PyArray_SHAPE(ret_array);
+    char* pDataPtr = (char*)PyArray_DATA(ret_array);
+
+    int rows = shape[0];
+    int cols = shape[1];
+    int channels = shape[2];
+
+    IDebug("rows = %d, cols = %d, channels = %d", rows, cols, channels);
+
+    switch(channels){
+
+    case 1:
+        preImg = cv::Mat(rows, cols, CV_8UC1);
+        break;
+    case 2:
+        preImg = cv::Mat(rows, cols, CV_8UC2);
+        break;
+    case 3:
+        preImg = cv::Mat(rows, cols, CV_8UC3);
+        break;
+    }
+
+    memcpy(preImg.data, pDataPtr, rows*cols*channels);
     return 0;
+}
+
+bool PyBaseDetector::havePreImg(){
+    return true;
 }
