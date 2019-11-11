@@ -2,8 +2,8 @@
 
 #include <opencv2/highgui.hpp>
 
-SimapleDetector::SimapleDetector():CBaseDetector("LinemodDetector", false){
-
+SimapleDetector::SimapleDetector():CBaseDetector("SimapleDetector", false){
+    std::cout << "SimapleDetector init "<<std::endl;
 }
 
 int SimapleDetector::getResult(std::vector<pose> &poses){
@@ -11,12 +11,18 @@ int SimapleDetector::getResult(std::vector<pose> &poses){
 }
 
 int SimapleDetector::detection(){
-    cv::imwrite("/home/de/test.jpg", _colorImg);
+//    cv::imwrite("/home/de/test.jpg", _colorImg);
+    std::cout << "pointcloud2_ptr size: "<<pointcloud2_ptr.data.size()<<std::endl;
     return 0;
 }
 
 void SimapleDetector::setColorImg(const cv::Mat &inputImg){
     _colorImg = inputImg;
+}
+
+void SimapleDetector::setPointCloud(const pcl::PCLPointCloud2 &pointcloud2_ptr)
+{
+    this->pointcloud2_ptr = pointcloud2_ptr;
 }
 
 void SimapleDetector::setDepthImg(const cv::Mat &inputImg){

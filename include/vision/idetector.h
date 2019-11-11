@@ -23,7 +23,9 @@
 
 #include <iostream>
 #include <opencv2/imgproc/imgproc.hpp>
-
+#include "pcl/point_cloud.h"
+#include "pcl/point_types.h"
+#include "pcl/PCLPointCloud2.h"
 #include <yaml-cpp/yaml.h>
 
 #include <hplugin.h>
@@ -69,6 +71,13 @@ public:
      * @return void
      */
     virtual void setDepthImg(const cv::Mat &inputImg) = 0;
+
+    /**
+     * @brief   传递识别需要的深度图片数据
+     * @return void
+     */
+    virtual void setPointCloud(const pcl::PCLPointCloud2& pointcloud2_ptr) = 0;
+
 
     /**
      * @brief   获取识别过程中的预览图片

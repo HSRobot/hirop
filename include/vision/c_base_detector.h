@@ -18,6 +18,8 @@ public:
 
     void setDepthImg(const cv::Mat &inputImg);
 
+    void setPointCloud(const pcl::PCLPointCloud2 &pointcloud2_ptr);
+
     int isMultiDetector();
 
     int parseConfig(const YAML::Node &node);

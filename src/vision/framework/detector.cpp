@@ -41,7 +41,7 @@ int Detector::detectionOnce(const cv::Mat &depthImg, const cv::Mat &colorImg){
     detectorPtr->setDepthImg(depthImg);
 
     /**
-     * 暂时将线程功能关闭，因为当前Linemod识别器在线程下运行时有BUG
+     * 暂时将线程功能关闭
      */
     __detection(false);
     //    boost::function0<int> f =  boost::bind(&Detector::__detection,this, false);
@@ -52,6 +52,24 @@ int Detector::detectionOnce(const cv::Mat &depthImg, const cv::Mat &colorImg){
 
     return 0;
 
+}
+//
+int Detector::detectionOnce(const cv::Mat &depthImg, const cv::Mat &colorImg, const pcl::PCLPointCloud2 pointcloud2_ptr)
+{
+    if(detectionThr){
+        std::cerr << "start detection error: detection thread was runnig" << std::endl;
+        return -1;
+    }
+
+    if(!detectorPtr){
+        std::cerr << "start detection error: load detector was NULL" << std::endl;
+        return -1;
+    }
+    detectorPtr->setColorImg(colorImg);
+    detectorPtr->setDepthImg(depthImg);
+    detectorPtr->setPointCloud(pointcloud2_ptr);
+    __detection(false);
+    return 0;
 }
 
 int Detector::detection(std::string objectName, std::string detectorName, const cv::Mat &depthImg, const cv::Mat &colorImg){

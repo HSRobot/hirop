@@ -63,6 +63,11 @@ public:
     void setDepthImg(const cv::Mat &inputImg);
 
     /**
+     * @brief   传递识别需要的点云数据
+     * @return void
+     */
+    virtual void setPointCloud(const pcl::PCLPointCloud2 &pointcloud2_ptr);
+    /**
      * @brief   获取识别得到的位姿
      * @param[out] poses，识别到的物体和对应的位姿
      * @return 0 成功 -1 失败

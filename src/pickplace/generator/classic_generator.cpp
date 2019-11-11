@@ -82,7 +82,7 @@ int ClassicGenerator::setPlacePose(PoseStamped placeObjPose)
 
 int ClassicGenerator::genPickPose()
 {
-    euler origin_euler,cor_euler;
+    euler origin_euler;
     Quaternion quat_follow;
 
     quat_follow = m_pickpose.pose.orientation;
@@ -94,9 +94,9 @@ int ClassicGenerator::genPickPose()
              <<"orientation.x:"<<m_pickpose.pose.orientation.x<<std::endl
              <<"orientation.y:"<<m_pickpose.pose.orientation.y<<std::endl
              <<"orientation.x:"<<m_pickpose.pose.orientation.z<<std::endl;
-    std::cout<<"con_euler_r:"<<origin_euler.roll<<std::endl
-             <<"con_euler_p:"<<origin_euler.pitch<<std::endl
-             <<"con_euler_y:"<<origin_euler.yaw<<std::endl;
+    std::cout<<"con_euler_r:"<<(((origin_euler.roll)*180)/PI)<<std::endl
+             <<"con_euler_p:"<<(((origin_euler.pitch)*180)/PI)<<std::endl
+             <<"con_euler_y:"<<(((origin_euler.yaw)*180)/PI)<<std::endl;
 #endif
 
     if(!m_parm.sorting){
@@ -106,16 +106,32 @@ int ClassicGenerator::genPickPose()
     }
 
     if(!m_parm.follow_R){
-        quat_follow = tfQuatRotation(1, 0, 0, -(origin_euler.roll), quat_follow);
+        quat_follow = tfQuatRotation(1, 0, 0, (origin_euler.roll), quat_follow);
     }
     if(!m_parm.follow_P){
-        quat_follow = tfQuatRotation(0, 1, 0, -(origin_euler.pitch), quat_follow);
+        quat_follow = tfQuatRotation(0, 1, 0, (origin_euler.pitch), quat_follow);
     }
     if(!m_parm.follow_Y){
-        quat_follow = tfQuatRotation(0, 0, 1, -(origin_euler.yaw), quat_follow);
+        quat_follow = tfQuatRotation(0, 0, 1, (origin_euler.yaw), quat_follow);
     }
 
     Quaternion quatCon;
+
+    std::cout<<"quatfollow1.px,"
+              <<"quatfollow1.py,"
+              <<"quatfollow1.pz,"
+              <<"quatfollow1.qx,"
+              <<"quatfollow1.qy,"
+              <<"quatfollow1.qz,"
+              <<"quatfollow1.qw ="
+
+              <<m_pickpose.pose.position.x<<" "
+              <<m_pickpose.pose.position.y<<" "
+              <<m_pickpose.pose.position.z<<" "
+              <<quat_follow.x <<" "
+              <<quat_follow.y<<" "
+              <<quat_follow.z<<" "
+              <<quat_follow.w <<std::endl;
 
     quatConvect(quat_follow, 1, quatCon);
 

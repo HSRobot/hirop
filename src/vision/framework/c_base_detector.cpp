@@ -26,6 +26,11 @@ void CBaseDetector::setDepthImg(const cv::Mat &inputImg){
 
 }
 
+void CBaseDetector::setPointCloud(const pcl::PCLPointCloud2& pointcloud2_ptr)
+{
+
+}
+
 int CBaseDetector::isMultiDetector(){
     return _isMultiDetector;
 }

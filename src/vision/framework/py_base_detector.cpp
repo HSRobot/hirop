@@ -150,6 +150,11 @@ void PyBaseDetector::setDepthImg(const cv::Mat &inputImg){
     delete depthTmp;
 }
 
+void PyBaseDetector::setPointCloud(const pcl::PCLPointCloud2 &pointcloud2_ptr)
+{
+
+}
+
 int PyBaseDetector::getResult(std::vector<pose> &poses){
     PyLockHelper lock;
 

@@ -45,8 +45,14 @@ public:
      */
     void setColorImg(const cv::Mat &inputImg);
 
-private:
+    /**
+     * @brief   传递识别需要的点云数据
+     * @return void
+     */
+    virtual void setPointCloud(const pcl::PCLPointCloud2&  pointcloud2_ptr);
 
+private:
+    pcl::PCLPointCloud2 pointcloud2_ptr;
     cv::Mat _colorImg;
 
 };

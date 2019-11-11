@@ -237,7 +237,7 @@ int ClassicActuator::showObject(PoseStamped object_pose)
     _boxPose.header.frame_id = object_pose.frame_id;
     _boxPose.pose.position.x = object_pose.pose.position.x;
     _boxPose.pose.position.y = object_pose.pose.position.y;
-    _boxPose.pose.position.z = object_pose.pose.position.z;
+    _boxPose.pose.position.z = object_pose.pose.position.z - 0.05;
 
     _boxPose.pose.orientation.w = object_pose.pose.orientation.w;
     _boxPose.pose.orientation.x = object_pose.pose.orientation.x;

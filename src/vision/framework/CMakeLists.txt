@@ -6,7 +6,7 @@ ADD_LIBRARY(hirop_vision SHARED ${FRAMEWORK_SRCS} utils/py_lock_helper.cpp)
 
 
 IF(WITH_PYTHON3)
-    SET(PYTHON_LIB python3.5m)
+    SET(PYTHON_LIB python3.5)
 ELSE()
     SET(PYTHON_LIB python2.7)
 ENDIF()
@@ -15,6 +15,7 @@ TARGET_LINK_LIBRARIES(hirop_vision ${PYTHON_LIB}
     ${HPlugin_LIBRARIES}
     ${OpenCV_LIBRARIES}
     ${YAML_CPP_LIBRARIES}
+    ${PCL_LIBRARIES}
     boost_thread boost_system boost_filesystem)
 
 CONFIGURE_FILE(hirop_vision.cmake.in ${PROJECT_BINARY_DIR}/hirop_visionConfig.cmake @ONLY)

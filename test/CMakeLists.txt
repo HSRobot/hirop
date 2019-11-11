@@ -1,16 +1,24 @@
 # 支持C++11 因为Yaml-cpp使用了c++11
+
+FIND_PACKAGE(PCL REQUIRED)
+
+
 add_definitions(-std=c++11)
-
-add_executable(train_test train_test.cpp)
+INCLUDE_DIRECTORIES(${PCL_INCLUDE_DIRS})
+LINK_DIRECTORIES(${PCL_LIBRARY_DIRS})
 add_executable(detection_test detection_test.cpp)
-target_link_libraries(train_test
-    hirop_vision)
 target_link_libraries(detection_test
-    hirop_vision)
-
-install(TARGETS train_test DESTINATION bin)
-
+    hirop_vision ${PCL_LIBRARIES})
 install(TARGETS detection_test DESTINATION bin)
+
+
+#add_executable(train_test train_test.cpp)
+#target_link_libraries(train_test
+#    hirop_vision)
+
+
+#install(TARGETS train_test DESTINATION bin)
+
 
 #find_package(catkin REQUIRED COMPONENTS
 #  roscpp

@@ -85,7 +85,17 @@ public:
     int detectionOnce(const cv::Mat &depthImg, const cv::Mat &colorImg);
 
     /**
-     * @brief       开始进行物体识别，循环检测
+     * @brief detectionOnce 重载 添加pointcloud2
+     * @param depthImg
+     * @param colorImg
+     * @param pointcloud2_ptr
+     * @return
+     */
+    int detectionOnce(const cv::Mat &depthImg, const cv::Mat &colorImg, const pcl::PCLPointCloud2 pointcloud2_ptr);
+
+
+    /**
+     * @brief       开始进行物体识别，循环检测 暂时停用！
      * @param
      * @return
      */
