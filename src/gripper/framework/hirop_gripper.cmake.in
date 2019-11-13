@@ -1,0 +1,12 @@
+FIND_LIBRARY(hirop_gripper_LIBRARY hirop_gripper
+    PATHS @CMAKE_INSTALL_PREFIX@/lib
+    NO_DEFAULT_PATH
+)
+SET(hirop_gripper_LIBRARIES ${hirop_gripper_LIBRARY})
+
+FIND_PATH(hirop_gripper_INCLUDE_DIR gripper/gripper.h
+    PATHS @CMAKE_INSTALL_PREFIX@/include/hirop
+    NO_DEFAULT_PATH
+)
+
+SET(hirop_gripper_INCLUDE_DIRS ${hirop_gripper_INCLUDE_DIR})

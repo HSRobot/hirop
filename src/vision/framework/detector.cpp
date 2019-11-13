@@ -107,14 +107,10 @@ int Detector::__detection(bool loop){
 
     std::vector<pose> results;
     cv::Mat preImg;
-    int ret;
+    int ret ,ret_detection;
 
     // 开始识别[阻塞式函数]
-    ret = detectorPtr->detection();
-    if(ret){
-        std::cerr << "detection error" << std::endl;
-        goto _detectionFaile;
-    }
+    ret_detection = detectorPtr->detection();
 
     /**
      *  获取预览图片
@@ -125,6 +121,11 @@ int Detector::__detection(bool loop){
             std::cerr << "get preview image error" << std::endl;
             goto _detectionFaile;
         }
+    }
+
+    if(ret_detection){
+        std::cerr << "detection error" << std::endl;
+        goto _detectionFaile;
     }
 
     /**
