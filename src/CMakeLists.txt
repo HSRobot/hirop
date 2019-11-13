@@ -4,4 +4,4 @@ add_subdirectory(vision)
 #add_subdirectory(asr)
 add_subdirectory(data_manager)
 add_subdirectory(pickplace)
-
+add_subdirectory(gripper)
