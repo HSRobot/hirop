@@ -13,6 +13,6 @@ add_definitions(-D_PRINT_)
 ## 核心框架代码
 add_subdirectory(framework)
 ## 生成器代码
-add_subdirectory(inspire)
+add_subdirectory(serial)
 ## 执行器代码
-add_subdirectory(airpowere)
+add_subdirectory(robotIO)

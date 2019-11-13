@@ -20,7 +20,7 @@
 
 using namespace hirop_gripper;
 
-class AirpowereGripper:public CBaseGripper{
+class RobotIOGripper:public CBaseGripper{
 
 typedef struct Parameters{
         int32_t portIndex;
@@ -29,8 +29,8 @@ typedef struct Parameters{
     }Parameters;
 
 public:
-    AirpowereGripper();
-    ~AirpowereGripper();
+    RobotIOGripper();
+    ~RobotIOGripper();
 
     int parseConfig(YAML::Node& );
 

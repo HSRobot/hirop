@@ -9,20 +9,20 @@
 * @date		2019/11/６
 */
 
-#include "airpowere_gripper.h"
+#include "robotIO_gripper.h"
 
-AirpowereGripper::AirpowereGripper()
+RobotIOGripper::RobotIOGripper()
 {
     n_gripper = ros::NodeHandle();
     hsc3Client = n_gripper.serviceClient<hirop_msgs::setIODout>("hsc3SetIODout");
 }
 
-AirpowereGripper::~AirpowereGripper()
+RobotIOGripper::~RobotIOGripper()
 {
 
 }
 
-int AirpowereGripper::parseConfig(YAML::Node& yamlNode)
+int RobotIOGripper::parseConfig(YAML::Node& yamlNode)
 {
     YAML::Node node;
     if(!yamlNode["parameters"]){
@@ -43,7 +43,7 @@ int AirpowereGripper::parseConfig(YAML::Node& yamlNode)
     return 0;
 }
 
-int AirpowereGripper::openGripper()
+int RobotIOGripper::openGripper()
 {
     try {
         setIo_srv.request.value = m_parm.openVlaue;
@@ -62,7 +62,7 @@ int AirpowereGripper::openGripper()
     return 0;
 }
 
-int AirpowereGripper::closeGripper()
+int RobotIOGripper::closeGripper()
 {
     try {
         setIo_srv.request.value = m_parm.closeValue;
@@ -81,4 +81,4 @@ int AirpowereGripper::closeGripper()
     return 0;
 }
 
-H_EXPORT_PLUGIN(AirpowereGripper,  "AirpowereGripper",  "1.0")
+H_EXPORT_PLUGIN(RobotIOGripper,  "RobotIOGripper",  "1.0")

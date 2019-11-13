@@ -12,19 +12,19 @@
 * @date		2019/11/5
 */
 
-#include "inspire_gripper.h"
+#include "serial_gripper.h"
 
-InspireGripper::InspireGripper()
+SerialGripper::SerialGripper()
 {
 
 }
 
-InspireGripper::~InspireGripper()
+SerialGripper::~SerialGripper()
 {
 
 }
 
-int InspireGripper::parseConfig(YAML::Node& yamlNode)
+int SerialGripper::parseConfig(YAML::Node& yamlNode)
 {
     YAML::Node node;
     if(!yamlNode["parameters"]){
@@ -50,7 +50,7 @@ int InspireGripper::parseConfig(YAML::Node& yamlNode)
     return 0;
 }
 
-int InspireGripper::connectGripper()
+int SerialGripper::connectGripper()
 {
     try {
         ros_ser.setPort(m_parm.serialNum);
@@ -66,7 +66,7 @@ int InspireGripper::connectGripper()
     return 0;
 }
 
-bool InspireGripper::isConnectGripper()
+bool SerialGripper::isConnectGripper()
 {
     bool state = false;
     try{
@@ -78,7 +78,7 @@ bool InspireGripper::isConnectGripper()
     return state;
 }
 
-int InspireGripper::disConnectGripper()
+int SerialGripper::disConnectGripper()
 {
     try {
         ros_ser.close();
@@ -90,7 +90,7 @@ int InspireGripper::disConnectGripper()
     return 0;
 }
 
-int InspireGripper::openGripper()
+int SerialGripper::openGripper()
 {
     if(m_parm.speed > 1000 || m_parm.speed <1)
     {
@@ -123,7 +123,7 @@ int InspireGripper::openGripper()
     return 0;
 }
 
-int InspireGripper::closeGripper()
+int SerialGripper::closeGripper()
 {
     if(m_parm.speed > 1000 || m_parm.speed <1)
     {
@@ -169,7 +169,7 @@ int InspireGripper::closeGripper()
     return 0;
 }
 
-int InspireGripper::stopGripper()
+int SerialGripper::stopGripper()
 {
     unsigned char stop_buffer[] = ARRAY_STOP_GRIPPER;
 
@@ -187,7 +187,7 @@ int InspireGripper::stopGripper()
     return 0;
 }
 
-int InspireGripper::setOpenSize()
+int SerialGripper::setOpenSize()
 {
     if(m_parm.size_max > 1000 || m_parm.size_max <0)
     {
@@ -238,4 +238,4 @@ int InspireGripper::setOpenSize()
     return 0;
 }
 
-H_EXPORT_PLUGIN(InspireGripper,  "InspireGripper",  "1.0")
+H_EXPORT_PLUGIN(SerialGripper,  "SerialGripper",  "1.0")

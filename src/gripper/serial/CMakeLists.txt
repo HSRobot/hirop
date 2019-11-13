@@ -1,14 +1,14 @@
-##　气动夹爪驱动
-FIND_PACKAGE(hirop_msgs REQUIRED)
-INCLUDE_DIRECTORIES(${hirop_msgs_INCLUDE_DIRS})
+## 因时二指夹爪
+FIND_PACKAGE(serial REQUIRED)
+INCLUDE_DIRECTORIES(${serial_INCLUDE_DIRS})
 SET(ROS_LIB_PATH /opt/ros/kinetic/lib)
 
 LINK_DIRECTORIES(${ROS_LIB_PATH})
-ADD_LIBRARY(AirpowereGripper airpowere_gripper.cpp)
+ADD_LIBRARY(SerialGripper serial_gripper.cpp)
 
-TARGET_LINK_LIBRARIES(AirpowereGripper tf HPlugin yaml-cpp)
+TARGET_LINK_LIBRARIES(SerialGripper serial HPlugin yaml-cpp)
 
-INSTALL(TARGETS AirpowereGripper DESTINATION lib)
+INSTALL(TARGETS SerialGripper DESTINATION lib)
 
 ############################ Start Simaple Generator ############################
 

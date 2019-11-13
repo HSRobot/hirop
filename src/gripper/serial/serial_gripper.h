@@ -32,7 +32,7 @@
 
 using namespace hirop_gripper;
 
-class InspireGripper:public CBaseGripper{
+class SerialGripper:public CBaseGripper{
 
 typedef struct Parameters{
         std::string serialNum;
@@ -44,8 +44,8 @@ typedef struct Parameters{
     }Parameters;
 
 public:
-    InspireGripper();
-    ~InspireGripper();
+    SerialGripper();
+    ~SerialGripper();
 
     int parseConfig(YAML::Node& );
 

@@ -1,14 +1,14 @@
-## 因时二指夹爪
-FIND_PACKAGE(serial REQUIRED)
-INCLUDE_DIRECTORIES(${serial_INCLUDE_DIRS})
+##　IO控制夹爪驱动
+FIND_PACKAGE(hirop_msgs REQUIRED)
+INCLUDE_DIRECTORIES(${hirop_msgs_INCLUDE_DIRS})
 SET(ROS_LIB_PATH /opt/ros/kinetic/lib)
 
 LINK_DIRECTORIES(${ROS_LIB_PATH})
-ADD_LIBRARY(InspireGripper inspire_gripper.cpp)
+ADD_LIBRARY(RobotIOGripper robotIO_gripper.cpp)
 
-TARGET_LINK_LIBRARIES(InspireGripper serial HPlugin yaml-cpp)
+TARGET_LINK_LIBRARIES(RobotIOGripper tf HPlugin yaml-cpp)
 
-INSTALL(TARGETS InspireGripper DESTINATION lib)
+INSTALL(TARGETS RobotIOGripper DESTINATION lib)
 
 ############################ Start Simaple Generator ############################
 
