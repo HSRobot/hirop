@@ -13,6 +13,7 @@
 
 RobotIOGripper::RobotIOGripper()
 {
+    isConnect = false;
     commapi = new CommApi();
     proIO = new ProxyIO(commapi);
     commapi->setAutoConn(false);//关闭自动重连功能，否则连接失败
@@ -63,6 +64,7 @@ int RobotIOGripper::connectGripper()
         IErrorPrint("connect to hsc3 failed!!!,return val:" + ret);
         return -1;
     }
+    isConnect = true;
     return 0;
 }
 
@@ -76,9 +78,10 @@ int RobotIOGripper::disConnectGripper()
     ret = 1;
     ret = commapi->disconnect();
     if(ret != 0){
-        IErrorPrint("connect to hsc3 failed!!!,return val:" + ret);
+        IErrorPrint("connect to hsc3 failed!!!,return val: %d" , ret);
         return -1;
     }
+    isConnect = false;
     return 0;
 }
 
@@ -86,9 +89,17 @@ int RobotIOGripper::openGripper()
 {
     ret = 1;
 
+    if(!commapi->isConnected() && isConnect){
+        IErrorPrint("reconnect Robot");
+        if(connectGripper() != 0){
+            return -1;
+        }
+    }
+
     ret = proIO->setDout(m_parm.portIndex,m_parm.openVlaue);
     if(ret != 0){
-        IErrorPrint("set hsc3 IO failed!!!,return val:" + ret);
+        IErrorPrint("set hsc3 IO failed!!!,return val: %d" , ret);
+        return -1;
     }
 
     IErrorPrint("gripper open!");
@@ -98,9 +109,18 @@ int RobotIOGripper::openGripper()
 int RobotIOGripper::closeGripper()
 {
     ret = 1;
+
+    if(!commapi->isConnected() && isConnect){
+        IErrorPrint("reconnect Robot");
+        if(connectGripper() != 0){
+            return -1;
+        }
+    }
+
     ret = proIO->setDout(m_parm.portIndex,m_parm.closeValue);
     if(ret != 0){
-        IErrorPrint("set hsc3 IO failed!!!,return val:" + ret);
+        IErrorPrint("set hsc3 IO failed!!!,return val: %d" , ret);
+        return -1;
     }
     IErrorPrint("gripper closed!");
     return 0;

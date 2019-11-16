@@ -54,6 +54,8 @@ private:
     HMCErrCode ret;
 
     Parameters m_parm;
+
+    bool isConnect;
 };
 
 H_DECLARE_PLUGIN(IGripper)
