@@ -11,7 +11,7 @@ SET(ROS_LIB_PATH /opt/ros/kinetic/lib)
 
 LINK_DIRECTORIES(${ROS_LIB_PATH})
 
-INCLUDE_DIRECTORIES(${tf_INCLUDE_DIRS})
+INCLUDE_DIRECTORIES(${tf_INCLUDE_DIRS} /usr/include/eigen3)
 
 ADD_LIBRARY(ClassicActuator classic_actuator.cpp)
 
