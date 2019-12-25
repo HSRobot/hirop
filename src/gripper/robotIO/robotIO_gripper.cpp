@@ -13,13 +13,18 @@
 
 RobotIOGripper::RobotIOGripper()
 {
-    n_gripper = ros::NodeHandle();
-    hsc3Client = n_gripper.serviceClient<hirop_msgs::setIODout>("hsc3SetIODout");
+    isConnect = false;
+    commapi = new CommApi();
+    proIO = new ProxyIO(commapi);
+    commapi->setAutoConn(false);//关闭自动重连功能，否则连接失败
 }
 
 RobotIOGripper::~RobotIOGripper()
 {
-
+    proIO = NULL;
+    commapi = NULL;
+    delete proIO;
+    delete commapi;
 }
 
 int RobotIOGripper::parseConfig(YAML::Node& yamlNode)
@@ -30,12 +35,16 @@ int RobotIOGripper::parseConfig(YAML::Node& yamlNode)
         return -1;
     }
     node = yamlNode["parameters"];
+    m_parm.robotIp = node["airpowere"]["robotIp"].as<std::string>();
+    m_parm.robotPort = node["airpowere"]["robotPort"].as<ushort>();
     m_parm.portIndex = node["airpowere"]["portIndex"].as<int32_t>();
     m_parm.openVlaue = node["airpowere"]["openVlaue"].as<bool>();
     m_parm.closeValue = node["airpowere"]["closeValue"].as<bool>();
 
 #ifdef _COUT_
-    std::cout<<"m_parm.portIndex:"<<m_parm.portIndex<<std::endl
+    std::cout<<"m_parm.robotIp:"<<m_parm.robotIp<<std::endl
+              <<"m_parm.robotPort:"<<m_parm.robotPort<<std::endl
+              <<"m_parm.portIndex:"<<m_parm.portIndex<<std::endl
               <<"m_parm.openVlaue:"<<m_parm.openVlaue<<std::endl
               <<"m_parm.closeValue:"<<m_parm.closeValue<<std::endl;
 #endif
@@ -43,38 +52,74 @@ int RobotIOGripper::parseConfig(YAML::Node& yamlNode)
     return 0;
 }
 
-int RobotIOGripper::openGripper()
+int RobotIOGripper::connectGripper()
 {
-    try {
-        setIo_srv.request.value = m_parm.openVlaue;
-        setIo_srv.request.portIndex = m_parm.portIndex;
-
-        if(!(hsc3Client.call(setIo_srv))){
-            IErrorPrint("gripper server call failed!!!");
-            return -1;
-        }
-
-    } catch (ros::Exception& e) {
-        IErrorPrint("gripper server call error!!!");
+    ret = 1;
+    if(commapi->isConnected()){
+        IErrorPrint("already connect to hsc3!!!");
+        return 0;
+    }
+    ret = commapi->connect(m_parm.robotIp, m_parm.robotPort);
+    if(ret != 0){
+        IErrorPrint("connect to hsc3 failed!!!,return val:" + ret);
         return -1;
     }
+    isConnect = true;
+    return 0;
+}
+
+bool RobotIOGripper::isConnectGripper()
+{
+     return commapi->isConnected();
+}
+
+int RobotIOGripper::disConnectGripper()
+{
+    ret = 1;
+    ret = commapi->disconnect();
+    if(ret != 0){
+        IErrorPrint("connect to hsc3 failed!!!,return val: %d" , ret);
+        return -1;
+    }
+    isConnect = false;
+    return 0;
+}
+
+int RobotIOGripper::openGripper()
+{
+    ret = 1;
+
+    if(!commapi->isConnected() && isConnect){
+        IErrorPrint("reconnect Robot");
+        if(connectGripper() != 0){
+            return -1;
+        }
+    }
+
+    ret = proIO->setDout(m_parm.portIndex,m_parm.openVlaue);
+    if(ret != 0){
+        IErrorPrint("set hsc3 IO failed!!!,return val: %d" , ret);
+        return -1;
+    }
+
     IErrorPrint("gripper open!");
     return 0;
 }
 
 int RobotIOGripper::closeGripper()
 {
-    try {
-        setIo_srv.request.value = m_parm.closeValue;
-        setIo_srv.request.portIndex = m_parm.portIndex;
+    ret = 1;
 
-        if(!(hsc3Client.call(setIo_srv))){
-            IErrorPrint("gripper server call failed!!!");
+    if(!commapi->isConnected() && isConnect){
+        IErrorPrint("reconnect Robot");
+        if(connectGripper() != 0){
             return -1;
         }
+    }
 
-    } catch (ros::Exception& e) {
-        IErrorPrint("gripper server call error!!!");
+    ret = proIO->setDout(m_parm.portIndex,m_parm.closeValue);
+    if(ret != 0){
+        IErrorPrint("set hsc3 IO failed!!!,return val: %d" , ret);
         return -1;
     }
     IErrorPrint("gripper closed!");

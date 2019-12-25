@@ -12,17 +12,21 @@
 * @date		2018/10/10
 */
 
-#include <ros/ros.h>
-
-#include "hirop_msgs/setIODout.h"
-
 #include "gripper/c_base_gripper.h"
 
+#include "hsc3/CommApi.h"
+#include "hsc3/proxy/ProxyIO.h"
+#include "exception"
+
 using namespace hirop_gripper;
+using namespace Hsc3::Comm;
+using namespace Hsc3::Proxy;
 
 class RobotIOGripper:public CBaseGripper{
 
 typedef struct Parameters{
+        std::string robotIp;
+        ushort robotPort;
         int32_t portIndex;
         bool openVlaue;
         bool closeValue;
@@ -34,16 +38,24 @@ public:
 
     int parseConfig(YAML::Node& );
 
+    int connectGripper();
+
+    bool isConnectGripper();
+
+    int disConnectGripper();
+
     int openGripper();
 
     int closeGripper();
 
 private:
-    Parameters m_parm;
-    ros::NodeHandle n_gripper;
-    ros::ServiceClient hsc3Client;
-    hirop_msgs::setIODout setIo_srv;
+    CommApi *commapi;
+    ProxyIO *proIO;
+    HMCErrCode ret;
 
+    Parameters m_parm;
+
+    bool isConnect;
 };
 
 H_DECLARE_PLUGIN(IGripper)
