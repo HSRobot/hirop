@@ -6,7 +6,7 @@ ADD_LIBRARY(hirop_vision SHARED ${FRAMEWORK_SRCS} utils/py_lock_helper.cpp)
 
 
 IF(WITH_PYTHON3)
-    SET(PYTHON_LIB python3.5)
+    SET(PYTHON_LIB python3.5m)
 ELSE()
     SET(PYTHON_LIB python2.7)
 ENDIF()
