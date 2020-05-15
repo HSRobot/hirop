@@ -13,7 +13,6 @@
 */
 
 #include "serial_gripper.h"
-
 SerialGripper::SerialGripper()
 {
 
@@ -185,6 +184,22 @@ int SerialGripper::stopGripper()
     }
     IErrorPrint("gripper stop");
     return 0;
+}
+
+int SerialGripper::readGripperCurrenPose()
+{
+    unsigned char read_buffer_frame[] = ARRAY_CLOSE_GRIPPER;
+    int size_close_buffer = ARRAY_SIZE(read_buffer_frame);
+    ros_ser.write(read_buffer_frame,size_close_buffer);
+    IDebug("Read the GripperCurrenPose !!");
+
+    unsigned char read_buffer[8];
+    size_close_buffer = ARRAY_SIZE(read_buffer);
+    ros_ser.read(read_buffer,size_close_buffer );
+    for(auto it :read_buffer)
+    {
+        std::cout << it <<std::endl;
+    }
 }
 
 int SerialGripper::setOpenSize()

@@ -1,54 +1,54 @@
-# 支持C++11 因为Yaml-cpp使用了c++11
+## 支持C++11 因为Yaml-cpp使用了c++11
 
-FIND_PACKAGE(PCL REQUIRED)
-
-
-add_definitions(-std=c++11)
-INCLUDE_DIRECTORIES(${PCL_INCLUDE_DIRS})
-LINK_DIRECTORIES(${PCL_LIBRARY_DIRS})
-add_executable(detection_test detection_test.cpp)
-target_link_libraries(detection_test
-    hirop_vision ${PCL_LIBRARIES})
-install(TARGETS detection_test DESTINATION bin)
+#FIND_PACKAGE(PCL REQUIRED)
 
 
-#add_executable(train_test train_test.cpp)
-#target_link_libraries(train_test
-#    hirop_vision)
+#add_definitions(-std=c++11)
+#INCLUDE_DIRECTORIES(${PCL_INCLUDE_DIRS})
+#LINK_DIRECTORIES(${PCL_LIBRARY_DIRS})
+#add_executable(detection_test detection_test.cpp)
+#target_link_libraries(detection_test
+#    hirop_vision ${PCL_LIBRARIES})
+#install(TARGETS detection_test DESTINATION bin)
 
 
-#install(TARGETS train_test DESTINATION bin)
+##add_executable(train_test train_test.cpp)
+##target_link_libraries(train_test
+##    hirop_vision)
 
 
-#find_package(catkin REQUIRED COMPONENTS
-#  roscpp
-#  nav_msgs)
+##install(TARGETS train_test DESTINATION bin)
 
-#include_directories(${catkin_INCLUDE_DIRS})
 
-#add_executable(nav_test navigation_test.cpp)
+##find_package(catkin REQUIRED COMPONENTS
+##  roscpp
+##  nav_msgs)
 
-#target_link_libraries(nav_test
-#    hirop_nav)
+##include_directories(${catkin_INCLUDE_DIRS})
 
-#install(TARGETS nav_test DESTINATION bin)
+##add_executable(nav_test navigation_test.cpp)
 
-#INCLUDE_DIRECTORIES("${PROJECT_SOURCE_DIR}/3rds/include")
+##target_link_libraries(nav_test
+##    hirop_nav)
 
-#add_executable(asr_test asr_test.cpp)
+##install(TARGETS nav_test DESTINATION bin)
 
-#target_link_libraries(asr_test
-#    hirop_asr)
+##INCLUDE_DIRECTORIES("${PROJECT_SOURCE_DIR}/3rds/include")
 
-#install(TARGETS asr_test DESTINATION bin)
+##add_executable(asr_test asr_test.cpp)
 
-############################## Start Data Manager Test #############################
+##target_link_libraries(asr_test
+##    hirop_asr)
 
-#add_executable(dm_test dm_test.cpp)
+##install(TARGETS asr_test DESTINATION bin)
 
-#target_link_libraries(dm_test
-#    hirop_datamanager)
+############################### Start Data Manager Test #############################
 
-#install(TARGETS dm_test DESTINATION bin)
+##add_executable(dm_test dm_test.cpp)
 
-############################# End Data Manager Test #############################
+##target_link_libraries(dm_test
+##    hirop_datamanager)
+
+##install(TARGETS dm_test DESTINATION bin)
+
+############################## End Data Manager Test #############################

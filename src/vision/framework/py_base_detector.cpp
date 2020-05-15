@@ -5,7 +5,7 @@
 #include "utils/py_lock_helper.h"
 
 #include <stdlib.h>
-#include <eigen3/Eigen/Dense>
+//#include <eigen3/Eigen/Dense>
 #include <opencv2/core/eigen.hpp>
 #include <opencv2/opencv.hpp>
 #include <numpy/arrayobject.h>
