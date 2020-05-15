@@ -93,8 +93,13 @@ int PyLoader::initSysPath(){
     std::string chdir_cmd = std::string("sys.path.append(\"") + PATH + "\")";
     const char *cstr_cmd = chdir_cmd.c_str();
 
+    chdir_cmd = std::string("sys.path.append(\"") + "/home/maizitian/work/YOLO6d" + "\")";
+    const char *cstr_cmd_yolo6D = chdir_cmd.c_str();
+
     PyRun_SimpleString("import sys");
     PyRun_SimpleString(cstr_cmd);
+    PyRun_SimpleString(cstr_cmd_yolo6D);
+
 }
 
 void PyLoader::getTrainerList(std::vector<std::string> &trainerList){

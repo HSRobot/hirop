@@ -9,4 +9,4 @@ find_package(ecto_pcl REQUIRED)
 
 INCLUDE_DIRECTORIES(${PCL_INCLUDE_DIRS})
 
-#add_subdirectory(filters)
+add_subdirectory(filters)

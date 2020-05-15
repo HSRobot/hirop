@@ -13,7 +13,6 @@
 */
 
 #include "serial_gripper.h"
-
 SerialGripper::SerialGripper()
 {
 
@@ -100,25 +99,32 @@ int SerialGripper::openGripper()
 
     unsigned char open_buffer[] = ARRAY_OPEN_GRIPPER;
     int size_open_buffer = ARRAY_SIZE(open_buffer);
+L2:
+    while( readGripperCurrenPose() <= openVal ){
+        try {
+            //将输入值req.speed保存为临时变量，以备后面数值处理
+            int temp = m_parm.speed;
+            //将低8位存入open_buffer[5]
+            open_buffer[5]= (unsigned char)(temp&0xFF);
+            //将高8位存入open_buffer[6]
+            open_buffer[6]= (unsigned char)((temp&0xFF00)>>8);
+            //close_buffer[7]为校验和位 （（B2+B3+…+B8）&0xFF）
+            open_buffer[size_open_buffer-1]= (unsigned char)((open_buffer[2] + open_buffer[3] + \
+                                                         open_buffer[4] + open_buffer[5] + \
+                                                         open_buffer[6])&0xFF);
+            ros_ser.write(open_buffer,size_open_buffer);
+            IDebug("THE COMMAND OF --OPEN-- HAS BEEN LOADED!!!");
 
-    try {
-        //将输入值req.speed保存为临时变量，以备后面数值处理
-        int temp = m_parm.speed;
-        //将低8位存入open_buffer[5]
-        open_buffer[5]= (unsigned char)(temp&0xFF);
-        //将高8位存入open_buffer[6]
-        open_buffer[6]= (unsigned char)((temp&0xFF00)>>8);
-        //close_buffer[7]为校验和位 （（B2+B3+…+B8）&0xFF）
-        open_buffer[size_open_buffer-1]= (unsigned char)((open_buffer[2] + open_buffer[3] + \
-                                                     open_buffer[4] + open_buffer[5] + \
-                                                     open_buffer[6])&0xFF);
-        ros_ser.write(open_buffer,size_open_buffer);
-        IDebug("THE COMMAND OF --OPEN-- HAS BEEN LOADED!!!");
-
-    } catch (serial::IOException& e) {
-        IErrorPrint("gripper open failed!!!");
-        return -1;
+        } catch (serial::IOException& e) {
+            IErrorPrint("gripper open failed!!!");
+            return -1;
+        }
     }
+
+    int temp = readGripperCurrenPose();
+    if(temp <= openVal)
+        goto L2;
+
     IErrorPrint("gripper open!");
     return 0;
 }
@@ -136,35 +142,41 @@ int SerialGripper::closeGripper()
         return -1;
     }
 
+
     unsigned char close_buffer[] = ARRAY_CLOSE_GRIPPER;
     int size_close_buffer = ARRAY_SIZE(close_buffer);
+L1:
+    while(readGripperCurrenPose()  > closeVal ){
+        try {
+            //将输入值req.speed保存为临时变量，以备后面数值处理
+            int temp = m_parm.speed;
+            //将低8位存入close_buffer[5]
+            close_buffer[5]= (unsigned char)(temp&0xFF);
+            //将高8位存入close_buffer[6]
+            close_buffer[6]= (unsigned char)((temp&0xFF00)>>8);
 
-    try {
-        //将输入值req.speed保存为临时变量，以备后面数值处理
-        int temp = m_parm.speed;
-        //将低8位存入close_buffer[5]
-        close_buffer[5]= (unsigned char)(temp&0xFF);
-        //将高8位存入close_buffer[6]
-        close_buffer[6]= (unsigned char)((temp&0xFF00)>>8);
+            //将输入值req.force保存为临时变量，以备后面数值处理
+            temp = m_parm.force;
+            //将低8位存入close_buffer[7]
+            close_buffer[7]= (unsigned char)(temp&0xFF);
+            //将高8位存入close_buffer[8]
+            close_buffer[8]= (unsigned char)((temp&0xFF00)>>8);
+            //close_buffer[9]为校验和位 （（B2+B3+…+B8）&0xFF）
+            close_buffer[size_close_buffer-1]= (unsigned char)((close_buffer[2] + close_buffer[3] + \
+                                                          close_buffer[4] + close_buffer[5] + \
+                                                          close_buffer[6] + close_buffer[7] + close_buffer[8])&0xFF);
+            ros_ser.write(close_buffer,size_close_buffer);
+            IDebug("THE COMMAND OF --CLOSE-- HAS BEEN LOADED!!!");
+        } catch (serial::IOException& e) {
+            IErrorPrint("gripper close failed!!!");
+            return -1;
+        }
 
-        //将输入值req.force保存为临时变量，以备后面数值处理
-        temp = m_parm.force;
-        //将低8位存入close_buffer[7]
-        close_buffer[7]= (unsigned char)(temp&0xFF);
-        //将高8位存入close_buffer[8]
-        close_buffer[8]= (unsigned char)((temp&0xFF00)>>8);
-        //close_buffer[9]为校验和位 （（B2+B3+…+B8）&0xFF）
-        close_buffer[size_close_buffer-1]= (unsigned char)((close_buffer[2] + close_buffer[3] + \
-                                                      close_buffer[4] + close_buffer[5] + \
-                                                      close_buffer[6] + close_buffer[7] + close_buffer[8])&0xFF);
-
-        ros_ser.write(close_buffer,size_close_buffer);
-        IDebug("THE COMMAND OF --CLOSE-- HAS BEEN LOADED!!!");
-
-    } catch (serial::IOException& e) {
-        IErrorPrint("gripper close failed!!!");
-        return -1;
     }
+    int temp = readGripperCurrenPose();
+    if(temp > 500)
+        goto L1;
+
     IErrorPrint("gripper closed!");
     return 0;
 }
@@ -185,6 +197,36 @@ int SerialGripper::stopGripper()
     }
     IErrorPrint("gripper stop");
     return 0;
+}
+
+
+
+int SerialGripper::readGripperCurrenPose()
+{
+    //send
+    unsigned char read_buffer_frame[] = ARRAY_READ_GRIPPER_POSE;
+    int size_buffer = ARRAY_SIZE(read_buffer_frame);
+
+    //read
+    unsigned char read_buffer[8];
+    size_buffer = ARRAY_SIZE(read_buffer);
+
+    int val = -1;
+    size_t s = 0;
+    while(s == 0){
+        ros_ser.flush();
+
+        try {
+            ros_ser.write(read_buffer_frame,size_buffer);
+            usleep(100);
+            s =ros_ser.read(read_buffer,size_buffer );
+            val = bytes2int2(read_buffer);
+        } catch (serial::PortNotOpenedException& e) {
+            IErrorPrint("read size failed!");
+        }
+    }
+//    IErrorPrint("CurrenPose is %d",val );
+    return val;
 }
 
 int SerialGripper::setOpenSize()
