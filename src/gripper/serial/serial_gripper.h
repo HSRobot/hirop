@@ -11,7 +11,7 @@
 * @autor 	wanghaoqing
 * @date		2018/10/10
 */
-
+#pragma once
 #include <serial/serial.h>
 
 #include "gripper/c_base_gripper.h"
@@ -34,11 +34,9 @@
 
 
 using namespace hirop_gripper;
-
-
-
-
-
+/**
+ * @brief The SerialGripper class 因时二指夹抓
+ */
 class SerialGripper:public CBaseGripper{
 
 
@@ -68,6 +66,7 @@ public:
     int closeGripper();
 
     int stopGripper();
+
     int readGripperCurrenPose();
 
 private:
@@ -89,8 +88,13 @@ private:
 
         return iRetVal;
     }
-private:
+
+
+protected:
+    unsigned char getCheckNum(unsigned char *array, int lens);
     serial::Serial ros_ser;
+
+private:
     Parameters m_parm;
     const int closeVal = 100;
     const int openVal = 700;

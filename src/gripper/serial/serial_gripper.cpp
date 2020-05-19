@@ -61,7 +61,7 @@ int SerialGripper::connectGripper()
         IErrorPrint("Unable to open port!!!");
         return -1;
     }
-    IErrorPrint("Serial Port opened");
+    IErrorPrint("Serial Port open ok ");
     return 0;
 }
 
@@ -280,4 +280,13 @@ int SerialGripper::setOpenSize()
     return 0;
 }
 
-H_EXPORT_PLUGIN(SerialGripper,  "SerialGripper",  "1.0")
+unsigned char SerialGripper::getCheckNum(unsigned char* array, int lens)
+{
+    unsigned char sum = 0;
+    for(int i = 2; i <= lens - 2 ; i++){
+        sum +=array[i];
+    }
+    return sum&0XFF;
+}
+
+H_EXPORT_PLUGIN(SerialGripper,  "SerialGripper",  "1.1")

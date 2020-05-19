@@ -2,7 +2,8 @@
 #define EXCUTE_H
 
 #include <string>
-#include "configuer.h"#include "gripper.h"
+#include "configuer.h"
+#include "gripper.h"
 #include "cpp_loader.h"
 #include "c_base_gripper.h"
 
@@ -74,6 +75,19 @@ public:
      */
     int stopGripprt();
 
+    /**
+     * @brief getForceVal
+     * @param data
+     * @return
+     */
+    int getForceVal(std::vector<int>& data);
+
+    /**
+     * @brief setMoveSeq
+     * @param index
+     * @return
+     */
+    int setMoveSeq(int index);
 private:
     /**
      * @brief 加载器

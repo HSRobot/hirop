@@ -6,7 +6,7 @@
 #include <yaml-cpp/yaml.h>
 #include "hplugin.h"
 #include "gripper.h"
-
+#include <vector>
 namespace hirop_gripper {
 
 class IGripper{
@@ -57,6 +57,18 @@ public:
     virtual int getName(std::string &name) = 0;
 
     virtual ~IGripper(){}
+
+    /**
+     * @brief getForceVal 获取夹抓的力矩
+     * @return
+     */
+    virtual int getForceVal(std::vector<int>& data){}
+
+    /**
+     * @brief setMoveSeq 设置动作序列
+     * @param index
+     */
+    virtual int setMoveSeq(int index){}
 
 protected:
     // 保存器的字符描述

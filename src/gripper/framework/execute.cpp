@@ -149,3 +149,25 @@ int Gripper::stopGripprt()
     return 0;
 }
 
+int Gripper::getForceVal(std::vector<int> &data)
+{
+    if(this->gripperPtr->getForceVal(data) != 0){
+        IErrorPrint("gripper stop is  failed!!!");
+        return -1;
+    }
+
+    IDebug("gripper stop is  succeeful!!!");
+    return 0;
+}
+
+int Gripper::setMoveSeq(int index)
+{
+    if(this->gripperPtr->setMoveSeq(index) != 0){
+        IErrorPrint("gripper stop is  failed!!!");
+        return -1;
+    }
+
+    IDebug("gripper stop is  succeeful!!!");
+    return 0;
+}
+
