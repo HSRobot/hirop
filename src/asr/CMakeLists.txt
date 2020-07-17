@@ -11,10 +11,10 @@ add_library(hirop_asr SHARED ${ASR_SRCS} ${JSON_CPP_SRCS})
 add_definitions(-D_GLIBCXX_USE_CXX11_ABI=0)
 
 ## 指定自定义AIUI的路径
-set(AIUI_PATH "/home/maizitian/catkin_ws/Linux_aiui5.5.1059.0000_5e6c72df/")
+set(AIUI_PATH "/home/fshs/catkin_ws/kdxf/Linux_aiui5.5.1059.0000_5d706e05/")
 
 ## 指定自定义AIUI的APPID
-set(AIUI_APPID "5e6c72df")
+set(AIUI_APPID "5d706e05")
 
 ## 指定AIUI和msc文件夹所在的路径
 set(AIUI_CONFIG_PATH "${AIUI_PATH}/samples/aiui_sample/build")

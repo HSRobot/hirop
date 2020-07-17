@@ -24,8 +24,14 @@ int HSpeechRecognition::init(){
     aiui->init();
 }
 
+int HSpeechRecognition::isError()
+{
+    return aiui->isError();
+}
+
 int HSpeechRecognition::startListen(){
 
+    aiui->resetError();
     _islistening = true;
 
 }
@@ -47,7 +53,6 @@ void HSpeechRecognition::updateAudioData(char *buf, int size){
     if(size > 0 && isListening()){
         aiui->writeAudioData(buf, size);
     }
-
 }
 
 

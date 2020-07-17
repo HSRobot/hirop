@@ -144,12 +144,23 @@ int AIUIAsr::stopWriteAudioData(){
 
 }
 
+int AIUIAsr::isError()
+{
+    return listener.getListenState();
+}
+
+void AIUIAsr::resetError()
+{
+    listener.resetListenState();
+}
+
 AiuiListener::AiuiListener()
 {
     std::cout << "in AiuiListener" << std::endl;
     mTtsFileHelper = new FileUtil::DataFileHelper("");
     _listener = NULL;
 }
+
 
 AiuiListener::~AiuiListener()
 {
@@ -284,8 +295,10 @@ void AiuiListener::onEvent(const IAIUIEvent& event) const
         //cout << "onEvent --> EVENT_CMD_RETURN: arg1 is " << event.getArg1() << endl;
         if (AIUIConstant::CMD_SYNC == event.getArg1())
         {
-            int retcode = event.getArg2();
+            int retcode = event.getArg2();//10202
             int dtype = event.getData()->getInt("sync_dtype", -1);
+
+
 
             //cout << "onEvent --> EVENT_CMD_RETURN: dtype is " << dtype << endl;
 
@@ -367,8 +380,11 @@ void AiuiListener::onEvent(const IAIUIEvent& event) const
 
     case AIUIConstant::EVENT_ERROR:
     {
-        cout << "EVENT_ERROR:" << event.getArg1() << endl;
+        int error = event.getArg1();
+        cout << "EVENT_ERROR:" << error << endl;
         cout << " ERROR info is " << event.getInfo() << endl;
+        _listener->setAiuiErrorStatus(error);
+
     } break;
     }
 }

@@ -24,13 +24,17 @@ private:
     FileUtil::DataFileHelper* mTtsFileHelper;
 
     GetIntentListener *_listener;
-
 public:
     void onEvent(const IAIUIEvent& event) const;
 
     void setIntentListener(GetIntentListener *listener) {_listener = listener;}
 
+    int getListenState(){return _listener->getAiuiErrorStatus();}
+
+    void resetListenState(){_listener->setAiuiErrorStatus(0);}
+
     AiuiListener();
+
 
     ~AiuiListener();
 };
@@ -75,6 +79,18 @@ public:
      * @param listener              监听者对象
      */
     void setIntentListener(GetIntentListener *getIntentListener) {_getIntentListener = getIntentListener; listener.setIntentListener(getIntentListener);}
+
+
+    /**
+     * @brief isError
+     * @return
+     */
+    int isError();
+
+    /**
+     * @brief resetError
+     */
+    void resetError();
 
 private:
     /**
