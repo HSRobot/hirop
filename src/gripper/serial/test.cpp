@@ -6,10 +6,10 @@
 
 TEST(SERIAL, READ)
 {
-    fiveFingerSerialGripper s;
+    SerialGripper s;
 //    s.parseConfig();
     YAML::Node privateParam;
-    Configure *config = new Configure("/home/maizitian/catkin_ws/src/hirop_ros/gripper_bridge/config/GripperConfig0.yaml");
+    Configure *config = new Configure("/home/de/catkin_ws/src/hirop_ros/gripper_bridge/config/GripperConfig1.yaml");
     config->getPrivateParams(privateParam);
 
     int ret =s.parseConfig(privateParam);
@@ -17,15 +17,23 @@ TEST(SERIAL, READ)
     s.connectGripper();
     s.openGripper();
     ASSERT_EQ(true,s.isConnectGripper());
-    std::vector<int> data;
-    while(true){
-        ASSERT_EQ(0,s.getForceVal(data));
-        for(auto it : data)
-        {
-            std::cout <<it<<" ";
-        }
-        std::cout <<std::endl;
+    s.closeGripper();
+
+    for(int i = 0; i< 100;i++){
+        s.openGripper();
+        sleep(1);
+        ASSERT_EQ(true,s.isConnectGripper());
+        s.closeGripper();
     }
+//    std::vector<int> data;
+//    while(true){
+//        ASSERT_EQ(0,s.getForceVal(data));
+//        for(auto it : data)
+//        {
+//            std::cout <<it<<" ";
+//        }
+//        std::cout <<std::endl;
+//    }
 //    s.setMoveSeq(1);
 
 //    for(int i = 0; i< 100;i++){

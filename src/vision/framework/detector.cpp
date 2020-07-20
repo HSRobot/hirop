@@ -43,14 +43,14 @@ int Detector::detectionOnce(const cv::Mat &depthImg, const cv::Mat &colorImg){
     /**
      * 暂时将线程功能关闭
      */
-    __detection(false);
+    int ret = __detection(false);
     //    boost::function0<int> f =  boost::bind(&Detector::__detection,this, false);
     //    detectionThr = new boost::thread(f);
 
     //    // 启动线程
     //    detectionThr->timed_join(boost::posix_time::microseconds(1));
 
-    return 0;
+    return ret;
 
 }
 //

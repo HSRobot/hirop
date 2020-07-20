@@ -114,6 +114,11 @@ L2:
                                                          open_buffer[6])&0xFF);
             ros_ser.write(open_buffer,size_open_buffer);
             IDebug("THE COMMAND OF --OPEN-- HAS BEEN LOADED!!!");
+            usleep(100);
+            ros_ser.flush();
+            unsigned char read_buffer[9];
+            int size_close_buffer = ARRAY_SIZE(read_buffer);
+            unsigned char size = ros_ser.read(read_buffer,size_close_buffer );
 
         } catch (serial::IOException& e) {
             IErrorPrint("gripper open failed!!!");
@@ -166,6 +171,12 @@ L1:
                                                           close_buffer[4] + close_buffer[5] + \
                                                           close_buffer[6] + close_buffer[7] + close_buffer[8])&0xFF);
             ros_ser.write(close_buffer,size_close_buffer);
+            usleep(100);
+            ros_ser.flush();
+            unsigned char read_buffer[9];
+            int size_close_buffer = ARRAY_SIZE(read_buffer);
+            unsigned char size = ros_ser.read(read_buffer,size_close_buffer );
+
             IDebug("THE COMMAND OF --CLOSE-- HAS BEEN LOADED!!!");
         } catch (serial::IOException& e) {
             IErrorPrint("gripper close failed!!!");

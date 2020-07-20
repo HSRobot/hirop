@@ -5,10 +5,10 @@ SET(ROS_LIB_PATH /opt/ros/kinetic/lib)
 
 LINK_DIRECTORIES(${ROS_LIB_PATH} /usr/local/lib)
 
-ADD_LIBRARY(SerialGripper serial_gripper.cpp)
+ADD_LIBRARY(SerialGripper SHARED serial_gripper.cpp)
 TARGET_LINK_LIBRARIES(SerialGripper serial HPlugin yaml-cpp)
 
-ADD_LIBRARY(fiveFingerSerialGripper serial_gripper.cpp fiveFingerSerialGripper.cpp)
+ADD_LIBRARY(fiveFingerSerialGripper SHARED serial_gripper.cpp fiveFingerSerialGripper.cpp)
 TARGET_LINK_LIBRARIES(fiveFingerSerialGripper serial HPlugin yaml-cpp)
 
 add_executable(serialGripperTest test.cpp serial_gripper.cpp fiveFingerSerialGripper.cpp)

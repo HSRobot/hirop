@@ -183,6 +183,7 @@ int PyBaseDetector::getResult(std::vector<pose> &poses){
     /**
      * 如果包含数据则进行处理
      */
+    int res = 0;
     if( rows > 0 ){
         poses.reserve(rows);
         for(int i = 0; i < shape[0]; ++i){
@@ -196,6 +197,7 @@ int PyBaseDetector::getResult(std::vector<pose> &poses){
             p.quaternion.z = static_cast<double>(pDataPtr[row + 5]);
             p.quaternion.w = static_cast<double>(pDataPtr[row + 6]);
             poses.push_back(p);
+            res = 0;
         }
     }else{
         pose p;
@@ -207,13 +209,14 @@ int PyBaseDetector::getResult(std::vector<pose> &poses){
         p.quaternion.z = 0;
         p.quaternion.w = 1;
         poses.push_back(p);
+        res = -1;
     }
 
     Py_DECREF(pDataPtr);
     Py_DECREF(ret_array);
 
     //    Py_DECREF(ret);
-    return 0;
+    return res;
 }
 
 int PyBaseDetector::getName(std::string &name){
