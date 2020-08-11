@@ -13,6 +13,7 @@ add_definitions(-D_GLIBCXX_USE_CXX11_ABI=0)
 ## 指定自定义AIUI的路径
 set(AIUI_PATH "/home/de/catkin_ws/kdxf/Linux_aiui5.5.1059.0000_5d706e05/")
 
+
 ## 指定自定义AIUI的APPID
 set(AIUI_APPID "5d706e05")
 

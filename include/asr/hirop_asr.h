@@ -51,6 +51,11 @@ public:
      */
     bool isListening() {return _islistening;}
 
+    /**
+     * @brief isError
+     * @return
+     */
+    int isError();
 private:
     /**
      * @brief __listening   监听中的线程

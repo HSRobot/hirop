@@ -6,3 +6,5 @@ add_subdirectory(asr)
 #add_subdirectory(pickplace)
 add_subdirectory(gripper)
 add_subdirectory(force)
+#add_subdirectory(gripper)
+
