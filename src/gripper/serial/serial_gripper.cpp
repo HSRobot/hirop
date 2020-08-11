@@ -112,10 +112,11 @@ L2:
             open_buffer[size_open_buffer-1]= (unsigned char)((open_buffer[2] + open_buffer[3] + \
                                                          open_buffer[4] + open_buffer[5] + \
                                                          open_buffer[6])&0xFF);
+            ros_ser.flush();
+
             ros_ser.write(open_buffer,size_open_buffer);
             IDebug("THE COMMAND OF --OPEN-- HAS BEEN LOADED!!!");
             usleep(100);
-            ros_ser.flush();
             unsigned char read_buffer[9];
             int size_close_buffer = ARRAY_SIZE(read_buffer);
             unsigned char size = ros_ser.read(read_buffer,size_close_buffer );
@@ -150,8 +151,8 @@ int SerialGripper::closeGripper()
 
     unsigned char close_buffer[] = ARRAY_CLOSE_GRIPPER;
     int size_close_buffer = ARRAY_SIZE(close_buffer);
-L1:
-    while(readGripperCurrenPose()  > closeVal ){
+//L1:
+//    while(readGripperCurrenPose()  > closeVal ){
         try {
             //将输入值req.speed保存为临时变量，以备后面数值处理
             int temp = m_parm.speed;
@@ -170,23 +171,24 @@ L1:
             close_buffer[size_close_buffer-1]= (unsigned char)((close_buffer[2] + close_buffer[3] + \
                                                           close_buffer[4] + close_buffer[5] + \
                                                           close_buffer[6] + close_buffer[7] + close_buffer[8])&0xFF);
-            ros_ser.write(close_buffer,size_close_buffer);
-            usleep(100);
             ros_ser.flush();
+
+            ros_ser.write(close_buffer,size_close_buffer);
+//            usleep(100);
             unsigned char read_buffer[9];
             int size_close_buffer = ARRAY_SIZE(read_buffer);
             unsigned char size = ros_ser.read(read_buffer,size_close_buffer );
-
+            std::cout <<"size: "<<size<<std::endl;
             IDebug("THE COMMAND OF --CLOSE-- HAS BEEN LOADED!!!");
         } catch (serial::IOException& e) {
             IErrorPrint("gripper close failed!!!");
             return -1;
         }
 
-    }
-    int temp = readGripperCurrenPose();
-    if(temp > 500)
-        goto L1;
+//    }
+//    int temp = readGripperCurrenPose();
+//    if(temp > 500)
+//        goto L1;
 
     IErrorPrint("gripper closed!");
     return 0;
@@ -225,11 +227,12 @@ int SerialGripper::readGripperCurrenPose()
     int val = -1;
     size_t s = 0;
     while(s == 0){
-        ros_ser.flush();
 
         try {
             ros_ser.write(read_buffer_frame,size_buffer);
             usleep(100);
+            ros_ser.flush();
+
             s =ros_ser.read(read_buffer,size_buffer );
             val = bytes2int2(read_buffer);
         } catch (serial::PortNotOpenedException& e) {

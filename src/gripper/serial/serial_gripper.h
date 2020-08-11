@@ -97,7 +97,7 @@ protected:
 private:
     Parameters m_parm;
     const int closeVal = 100;
-    const int openVal = 700;
+    const int openVal = 900;
 };
 
 

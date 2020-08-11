@@ -1,0 +1,15 @@
+parameters: 
+# 插件的名称
+  plugin_name: hsImpenderrForce
+
+  forceName: hsImpenderrForce
+# 插补的时间长度
+  time_stamp: 40
+# 第一轴 到 第 六 轴 的方向使能
+  direction: 1, 1, 1, 1, 1, 1	
+# 第一轴 到 第 六 轴 的刚性
+  Mass: 1, 1, 1, 1, 1, 1
+# 第一轴 到 第 六 轴 的阻尼
+  Damping: 5, 5, 5, 5, 5, 5
+# 第一轴 到 第 六 轴 的惯性
+  Stiffness: 5, 5, 5, 5, 5, 5 

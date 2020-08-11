@@ -21,7 +21,7 @@ TEST(SERIAL, READ)
 
     for(int i = 0; i< 100;i++){
         s.openGripper();
-        sleep(1);
+//        sleep(1);
         ASSERT_EQ(true,s.isConnectGripper());
         s.closeGripper();
     }
